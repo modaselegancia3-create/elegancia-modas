@@ -35,9 +35,10 @@ export default function Inicio() {
   }, [])
 
   const todos = produtos ?? []
-  // peças escolhidas no painel (na ordem escolhida); sem escolha = automático
+  // peças escolhidas no painel (na ordem escolhida), mesmo sem estoque (aparecem como "Esgotado");
+  // sem escolha = automático
   const escolhidas = (ids: string[] | null | undefined) =>
-    (ids ?? []).map((id) => todos.find((p) => p.id === id)).filter((p): p is Produto => !!p && emEstoque(p))
+    (ids ?? []).map((id) => todos.find((p) => p.id === id)).filter((p): p is Produto => !!p)
   const lancamentos = useMemo(
     () => (config.lancamentos_ids?.length ? escolhidas(config.lancamentos_ids) : todos.filter(emEstoque).slice(0, 12)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
