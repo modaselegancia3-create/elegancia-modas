@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 
 const POS = 'elegancia-scroll'
-const ULTIMA = 'elegancia-ultima-pagina'
-const RETOMAR_ATE_MIN = 60 // volta para a última página se reabrir em até 60 min
 
 function lerPosicoes(): Record<string, number> {
   try {
@@ -16,7 +14,6 @@ function lerPosicoes(): Record<string, number> {
 /**
  * - Volta para o MESMO ponto da página ao usar "voltar".
  * - Página nova começa no topo.
- * - Reabrindo o site em até 60 min, volta para a página onde a cliente estava.
  * - Arrastar o dedo da borda esquerda para a direita volta uma tela.
  */
 export default function Navegacao() {
@@ -24,7 +21,6 @@ export default function Navegacao() {
   const tipo = useNavigationType()
   const navigate = useNavigate()
   const chave = location.key
-  const primeira = useRef(true)
 
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
@@ -69,38 +65,14 @@ export default function Navegacao() {
     requestAnimationFrame(tentar)
   }, [chave, tipo])
 
-  // lembra a última página e retoma ao reabrir
+  // limpa o "retomar página" de versões anteriores
   useEffect(() => {
-    const caminho = location.pathname + location.search
-    if (primeira.current) {
-      primeira.current = false
-      let jaRetomou = false
-      try {
-        jaRetomou = sessionStorage.getItem('elegancia-retomou') === '1'
-        sessionStorage.setItem('elegancia-retomou', '1')
-      } catch {
-        /* ignora */
-      }
-      if (!jaRetomou && caminho === '/') {
-        try {
-          const u = JSON.parse(localStorage.getItem(ULTIMA) || 'null') as { c: string; t: number } | null
-          if (u && u.c && u.c !== '/' && Date.now() - u.t < RETOMAR_ATE_MIN * 60000) {
-            navigate(u.c, { replace: true })
-            return
-          }
-        } catch {
-          /* ignora */
-        }
-      }
+    try {
+      localStorage.removeItem('elegancia-ultima-pagina')
+    } catch {
+      /* ignora */
     }
-    if (!location.pathname.startsWith('/admin')) {
-      try {
-        localStorage.setItem(ULTIMA, JSON.stringify({ c: caminho, t: Date.now() }))
-      } catch {
-        /* ignora */
-      }
-    }
-  }, [location.pathname, location.search, navigate])
+  }, [])
 
   // gesto: arrastar da borda esquerda para a direita = voltar
   useEffect(() => {
