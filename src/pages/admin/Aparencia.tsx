@@ -4,12 +4,12 @@ import { useConfig } from '../../context/ConfigContext'
 import { buscarConfig, posicaoCss, type Config } from '../../lib/config'
 import { supabase } from '../../lib/supabase'
 
-const campo = 'border border-[#CFCAC2] bg-white px-3 py-3 text-base w-full'
-const rotulo = 'flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase text-muted'
+const campo = 'border border-[#CFCAC2] bg-white px-3 py-3 text-base w-full min-w-0 max-w-full rounded-none'
+const rotulo = 'min-w-0 flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase text-muted'
 
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <section className="bg-white border border-line p-5 flex flex-col gap-4">
+    <section className="bg-white border border-line p-4 md:p-5 flex flex-col gap-4 min-w-0">
       <h2 className="font-serif text-2xl">{titulo}</h2>
       {children}
     </section>
@@ -99,8 +99,8 @@ export default function Aparencia() {
       </div>
 
       <Secao titulo="Capa da página inicial">
-        <div className="grid md:grid-cols-[2fr_1fr] gap-6">
-          <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6">
+          <div className="flex flex-col gap-3 min-w-0">
             <CampoFoto
               rotulo="Foto no computador"
               dica="Foto deitada (horizontal), de preferência."
@@ -111,7 +111,7 @@ export default function Aparencia() {
             />
             <Enquadramento id="pos-desk" valor={c.capa_posicao} onChange={(v) => set('capa_posicao', v)} />
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 min-w-0">
             <CampoFoto
               rotulo="Foto no celular"
               dica="Foto em pé. Se não tiver, usa a do computador."
@@ -123,7 +123,7 @@ export default function Aparencia() {
             <Enquadramento id="pos-mob" valor={c.capa_posicao_mobile} onChange={(v) => set('capa_posicao_mobile', v)} />
           </div>
         </div>
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <label className={rotulo}>
             Título grande
             <input className={campo} value={c.capa_titulo ?? ''} onChange={(e) => set('capa_titulo', e.target.value)} placeholder="Deixe vazio para esconder" />
@@ -158,7 +158,7 @@ export default function Aparencia() {
             ))}
           </select>
         </label>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className={rotulo}>
             Título
             <input className={campo} value={c.look_titulo ?? ''} onChange={(e) => set('look_titulo', e.target.value)} />
@@ -175,9 +175,9 @@ export default function Aparencia() {
           <input type="checkbox" className="w-5 h-5 accent-ink" checked={c.editorial_ativo} onChange={(e) => set('editorial_ativo', e.target.checked)} />
           Mostrar no site
         </label>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <CampoFoto rotulo="Foto" valor={c.editorial_foto_url} onChange={(u) => set('editorial_foto_url', u)} proporcao="4/3" />
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 min-w-0">
             <label className={rotulo}>
               Selo (texto pequeno dourado)
               <input className={campo} value={c.editorial_selo ?? ''} onChange={(e) => set('editorial_selo', e.target.value)} />
@@ -195,7 +195,7 @@ export default function Aparencia() {
       </Secao>
 
       <Secao titulo="Dados da loja (rodapé e WhatsApp)">
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <label className={rotulo}>
             WhatsApp (com DDD)
             <input className={campo} inputMode="tel" value={c.whatsapp ?? ''} onChange={(e) => set('whatsapp', e.target.value)} placeholder="(64) 99999-9999" />

@@ -67,7 +67,7 @@ export default function LayoutAdmin() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#FAF8F5] pb-20 md:pb-0 overflow-x-hidden">
       <header className="bg-ink text-[#E9DCC2] sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link to="/admin" className="flex items-center gap-2.5">
@@ -104,7 +104,7 @@ export default function LayoutAdmin() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-5 md:py-8">
+      <main className="max-w-5xl mx-auto px-4 py-5 md:py-8 min-w-0">
         <Outlet />
       </main>
 

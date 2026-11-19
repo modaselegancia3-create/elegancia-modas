@@ -14,8 +14,8 @@ import { buscarCategorias } from '../../lib/catalogo'
 import { padronizarFoto } from '../../lib/imagem'
 import type { Categoria } from '../../types'
 
-const campo = 'border border-[#CFCAC2] bg-white px-3 py-3 text-base w-full'
-const rotulo = 'flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase text-muted'
+const campo = 'border border-[#CFCAC2] bg-white px-3 py-3 text-base w-full min-w-0 max-w-full rounded-none'
+const rotulo = 'min-w-0 flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase text-muted'
 
 export default function PecaEditar() {
   const { id } = useParams()
@@ -160,7 +160,7 @@ export default function PecaEditar() {
       </div>
 
       {/* FOTOS */}
-      <section className="bg-white border border-line p-5 flex flex-col gap-4">
+      <section className="bg-white border border-line p-4 md:p-5 min-w-0 flex flex-col gap-4">
         <div>
           <h2 className="font-serif text-2xl">Fotos</h2>
           <p className="text-xs text-muted">
@@ -208,7 +208,7 @@ export default function PecaEditar() {
       </section>
 
       {/* DADOS */}
-      <section className="bg-white border border-line p-5 grid md:grid-cols-2 gap-4">
+      <section className="bg-white border border-line p-4 md:p-5 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-4">
         <h2 className="font-serif text-2xl md:col-span-2">Informações</h2>
         <label className={`${rotulo} md:col-span-2`}>
           Nome da peça
@@ -258,7 +258,7 @@ export default function PecaEditar() {
       </section>
 
       {/* GRADE */}
-      <section className="bg-white border border-line p-5 flex flex-col gap-5">
+      <section className="bg-white border border-line p-4 md:p-5 min-w-0 flex flex-col gap-5">
         <div>
           <h2 className="font-serif text-2xl">Cores, tamanhos e estoque</h2>
           <p className="text-xs text-muted">Total em estoque: {totalEstoque} {totalEstoque === 1 ? 'peça' : 'peças'}</p>
@@ -280,7 +280,7 @@ export default function PecaEditar() {
                 {t}
               </button>
             ))}
-            <span className="flex">
+            <span className="flex max-w-full">
               <label className="sr-only" htmlFor="novo-tam">Outro tamanho</label>
               <input
                 id="novo-tam"
@@ -305,11 +305,11 @@ export default function PecaEditar() {
         <div className="flex flex-col gap-2">
           <span className="text-xs tracking-[0.1em] uppercase text-muted">Cores</span>
           {f.cores.map((c, i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={i} className="flex items-center gap-2 min-w-0">
               <label className="sr-only" htmlFor={`cor-hex-${i}`}>Tom da cor</label>
               <input id={`cor-hex-${i}`} type="color" value={c.hex} onChange={(e) => mudarCor(i, 'hex', e.target.value)} className="w-11 h-11 border border-line p-0.5 bg-white" />
               <label className="sr-only" htmlFor={`cor-nome-${i}`}>Nome da cor</label>
-              <input id={`cor-nome-${i}`} value={c.nome} onChange={(e) => mudarCor(i, 'nome', e.target.value)} className="border border-[#CFCAC2] px-3 py-2.5 flex-1 max-w-xs" />
+              <input id={`cor-nome-${i}`} value={c.nome} onChange={(e) => mudarCor(i, 'nome', e.target.value)} className="border border-[#CFCAC2] px-3 py-2.5 flex-1 min-w-0 max-w-xs" />
               <button type="button" onClick={() => removerCor(i)} disabled={f.cores.length <= 1} className="text-xs underline text-[#A3361F] disabled:opacity-30 min-h-[44px] px-2">
                 Remover
               </button>
@@ -321,7 +321,7 @@ export default function PecaEditar() {
         </div>
 
         {f.tamanhos.length > 0 && (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-w-full -mx-1 px-1">
             <table className="text-sm border-collapse min-w-full">
               <caption className="sr-only">Estoque por cor e tamanho</caption>
               <thead>
@@ -361,7 +361,7 @@ export default function PecaEditar() {
       </section>
 
       {/* FRETE */}
-      <details className="bg-white border border-line p-5">
+      <details className="bg-white border border-line p-4 md:p-5 min-w-0">
         <summary className="cursor-pointer font-serif text-2xl">Peso e medidas do pacote (frete)</summary>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           <label className={rotulo}>

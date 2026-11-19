@@ -16,6 +16,8 @@ export default function CampoFoto({ rotulo, dica, valor, onChange, proporcao = '
   const input = useRef<HTMLInputElement>(null)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+  const [pw, ph] = proporcao.split('/').map(Number)
+  const emPe = ph > pw
 
   async function escolher(e: ChangeEvent<HTMLInputElement>) {
     const arq = e.target.files?.[0]
@@ -36,10 +38,13 @@ export default function CampoFoto({ rotulo, dica, valor, onChange, proporcao = '
   }
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 min-w-0">
       <span className="text-xs tracking-[0.1em] uppercase text-muted">{rotulo}</span>
       {dica && <span className="text-xs text-muted -mt-1">{dica}</span>}
-      <div className="relative bg-[#F3F1EE] border border-line overflow-hidden" style={{ aspectRatio: proporcao }}>
+      <div
+        className="relative bg-[#F3F1EE] border border-line overflow-hidden w-full"
+        style={{ aspectRatio: proporcao, maxWidth: emPe ? 260 : undefined }}
+      >
         {valor ? (
           <img src={valor} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: posicao }} />
         ) : (
