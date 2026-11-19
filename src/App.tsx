@@ -11,6 +11,7 @@ import Login from './pages/admin/Login'
 import PecaEditar from './pages/admin/PecaEditar'
 import Pecas from './pages/admin/Pecas'
 import Categorias from './pages/Categorias'
+import Conta from './pages/Conta'
 import Inicio from './pages/Inicio'
 import NaoEncontrado from './pages/NaoEncontrado'
 import Produto from './pages/Produto'
@@ -35,6 +36,7 @@ function Loja() {
           <Route path="/categorias" element={<Categorias />} />
           <Route path="/produto/:slug" element={<Produto />} />
           <Route path="/sacola" element={<Sacola />} />
+          <Route path="/conta" element={<Conta />} />
           <Route path="*" element={<NaoEncontrado />} />
         </Routes>
       </main>

@@ -25,6 +25,13 @@ export type Config = {
   endereco: string | null
   horario: string | null
   cnpj: string | null
+  avisos_ativo: boolean
+  banners_ativo: boolean
+  filtro_tamanho_ativo: boolean
+  filtro_tamanho_titulo: string | null
+  videos_ativo: boolean
+  videos_titulo: string | null
+  look_ativo: boolean
 }
 
 export const CONFIG_PADRAO: Config = {
@@ -52,6 +59,13 @@ export const CONFIG_PADRAO: Config = {
   endereco: null,
   horario: null,
   cnpj: null,
+  avisos_ativo: true,
+  banners_ativo: true,
+  filtro_tamanho_ativo: true,
+  filtro_tamanho_titulo: 'Filtrar por tamanho',
+  videos_ativo: true,
+  videos_titulo: 'Descubra cada detalhe em vídeo',
+  look_ativo: true,
 }
 
 export async function buscarConfig(): Promise<Config> {

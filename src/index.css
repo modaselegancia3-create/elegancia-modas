@@ -70,3 +70,6 @@ button:disabled { cursor: not-allowed; }
 html, body { max-width: 100%; overflow-x: clip; } /* clip não quebra o topo fixo */
 img, video { max-width: 100%; }
 select { max-width: 100%; text-overflow: ellipsis; }
+
+.animar-aviso { animation: aviso .5s ease both; }
+@keyframes aviso { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

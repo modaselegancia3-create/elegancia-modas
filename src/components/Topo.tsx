@@ -1,48 +1,58 @@
+import { useCallback, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
-import { IconeSacola } from './Icones'
+import Avisos from './Avisos'
+import { IconeMenu, IconeSacola } from './Icones'
+import MenuLateral from './MenuLateral'
 
 const LINKS = [
-  { to: '/', label: 'Novidades' },
+  { to: '/', label: 'Lançamentos' },
   { to: '/?cat=vestidos', label: 'Vestidos' },
   { to: '/?cat=blusas', label: 'Blusas' },
   { to: '/?cat=calcas', label: 'Calças' },
   { to: '/?cat=conjuntos', label: 'Conjuntos' },
-  { to: '/?cat=semijoias', label: 'Semijoias' },
 ]
 
 export default function Topo() {
   const { quantidadeTotal } = useSacola()
-  const { config } = useConfig()
+  const [menu, setMenu] = useState(false)
+  const fechar = useCallback(() => setMenu(false), [])
+
   return (
-    <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-line">
-      {config.aviso_topo && (
-        <div className="bg-ink text-[#E9DCC2] text-[11px] tracking-[0.2em] uppercase text-center py-2 px-4">
-          {config.aviso_topo}
+    <>
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-line">
+        <Avisos />
+        <div className="max-w-6xl mx-auto px-2 md:px-4 h-16 grid grid-cols-[auto_1fr_auto] md:flex items-center gap-2 md:gap-6">
+          <button type="button" onClick={() => setMenu(true)} aria-label="Abrir menu" className="w-11 h-11 flex items-center justify-center">
+            <IconeMenu className="w-6 h-6" />
+          </button>
+          <Link to="/" className="flex items-center justify-center md:justify-start gap-2.5">
+            <img src="/logo.png" alt="" className="w-9 h-9" />
+            <span className="font-serif text-2xl tracking-[0.18em]">ELEGÂNCIA</span>
+          </Link>
+          <nav aria-label="Categorias" className="hidden md:flex flex-1 justify-center gap-7 text-xs tracking-[0.14em] uppercase">
+            {LINKS.map((l) => (
+              <NavLink key={l.label} to={l.to} className="hover:text-gold">
+                {l.label}
+              </NavLink>
+            ))}
+          </nav>
+          <Link
+            to="/sacola"
+            aria-label={`Sacola, ${quantidadeTotal} ${quantidadeTotal === 1 ? 'peça' : 'peças'}`}
+            className="relative w-11 h-11 md:w-auto md:px-4 md:border md:border-ink flex items-center justify-center gap-2 text-xs tracking-[0.12em] uppercase"
+          >
+            <IconeSacola className="w-6 h-6 md:w-5 md:h-5" />
+            <span className="hidden md:inline">Sacola ({quantidadeTotal})</span>
+            {quantidadeTotal > 0 && (
+              <span className="md:hidden absolute top-1 right-0.5 min-w-[16px] h-4 rounded-full bg-gold text-white text-[10px] flex items-center justify-center tracking-normal">
+                {quantidadeTotal}
+              </span>
+            )}
+          </Link>
         </div>
-      )}
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
-        <Link to="/" className="flex items-center gap-3 no-underline">
-          <img src="/logo.png" alt="" className="w-10 h-10" />
-          <span className="font-serif text-2xl tracking-[0.18em]">ELEGÂNCIA</span>
-        </Link>
-        <nav aria-label="Categorias" className="hidden md:flex gap-7 text-xs tracking-[0.14em] uppercase">
-          {LINKS.map((l) => (
-            <NavLink key={l.label} to={l.to} className="hover:text-gold">
-              {l.label}
-            </NavLink>
-          ))}
-        </nav>
-        <Link
-          to="/sacola"
-          aria-label={`Sacola, ${quantidadeTotal} ${quantidadeTotal === 1 ? 'peça' : 'peças'}`}
-          className="hidden md:inline-flex items-center gap-2 min-h-[44px] px-4 border border-ink text-xs tracking-[0.12em] uppercase"
-        >
-          <IconeSacola />
-          Sacola ({quantidadeTotal})
-        </Link>
-      </div>
-    </header>
+      </header>
+      <MenuLateral aberto={menu} onFechar={fechar} />
+    </>
   )
 }

@@ -256,3 +256,62 @@ export async function listarProdutosAdmin(): Promise<LinhaAdmin[]> {
     }
   })
 }
+
+/* ---------------- vídeos ---------------- */
+const LIMITE_VIDEO = 50 * 1024 * 1024
+
+/** Tira uma "foto" do vídeo (para mostrar enquanto carrega). */
+function capaDoVideo(arquivo: File): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(arquivo)
+    const v = document.createElement('video')
+    v.muted = true
+    v.playsInline = true
+    v.preload = 'auto'
+    v.src = url
+    const fim = (b: Blob | null) => {
+      URL.revokeObjectURL(url)
+      resolve(b)
+    }
+    v.onloadeddata = () => {
+      v.currentTime = Math.min(0.8, (v.duration || 1) / 3)
+    }
+    v.onseeked = () => {
+      const w = 720
+      const h = Math.round((v.videoHeight / v.videoWidth) * w) || 1280
+      const c = document.createElement('canvas')
+      c.width = w
+      c.height = h
+      const ctx = c.getContext('2d')
+      if (!ctx) return fim(null)
+      ctx.drawImage(v, 0, 0, w, h)
+      c.toBlob((b) => fim(b), 'image/jpeg', 0.8)
+    }
+    v.onerror = () => fim(null)
+    setTimeout(() => fim(null), 15000)
+  })
+}
+
+export async function enviarVideo(arquivo: File): Promise<{ video_url: string; capa_url: string | null }> {
+  if (arquivo.size > LIMITE_VIDEO) {
+    throw new Error(`O vídeo "${arquivo.name}" tem mais de 50 MB. Grave mais curto (até 30 segundos) ou envie em qualidade menor.`)
+  }
+  const ext = (arquivo.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4'
+  const caminho = `videos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from(BUCKET).upload(caminho, arquivo, {
+    contentType: arquivo.type || 'video/mp4',
+    upsert: false,
+  })
+  if (error) throw error
+  const video_url = supabase.storage.from(BUCKET).getPublicUrl(caminho).data.publicUrl
+  let capa_url: string | null = null
+  const capa = await capaDoVideo(arquivo)
+  if (capa) {
+    try {
+      capa_url = (await enviarFoto(capa, 'videos')).url
+    } catch {
+      capa_url = null
+    }
+  }
+  return { video_url, capa_url }
+}

@@ -11,6 +11,7 @@
 ## Banco (Supabase › SQL Editor)
 1. `supabase/schema.sql`
 2. `supabase/02_painel.sql` (depois de criar o usuário admin@eleganciamodas.com em Authentication › Users)
+3. `supabase/03_vitrine.sql` (avisos, banners, filtro por tamanho, vídeos)
 
 ## Painel
 Endereço: /admin — login com o usuário criado no Supabase.
