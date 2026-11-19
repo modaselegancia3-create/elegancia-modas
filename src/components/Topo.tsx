@@ -21,9 +21,8 @@ export default function Topo() {
           <button type="button" onClick={() => setMenu(true)} aria-label="Abrir menu" className="w-11 h-11 flex items-center justify-center">
             <IconeMenu className="w-6 h-6" />
           </button>
-          <Link to="/" className="flex items-center justify-center gap-2.5 min-w-0">
-            <img src="/logo.png" alt="" className="w-9 h-9 shrink-0" />
-            <span className="font-serif text-[22px] md:text-2xl tracking-[0.16em] truncate">ELEGÂNCIA</span>
+          <Link to="/" aria-label="Elegância — página inicial" className="flex items-center justify-center">
+            <img src="/logo.png" alt="Elegância" className="w-12 h-12 md:w-[52px] md:h-[52px]" />
           </Link>
           <div className="flex items-center justify-end">
             <button type="button" onClick={() => setBusca(true)} aria-label="Buscar peças" className="w-11 h-11 flex items-center justify-center">
