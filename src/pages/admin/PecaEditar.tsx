@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'r
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   carregarProduto,
+  excluirProduto,
   formularioVazio,
   salvarProduto,
   slugify,
@@ -143,7 +144,7 @@ export default function PecaEditar() {
   if (carregando) return <p className="text-sm text-muted">Carregando…</p>
 
   return (
-    <form onSubmit={salvar} className="flex flex-col gap-8 pb-28">
+    <form onSubmit={salvar} className="flex flex-col gap-8 pb-36 md:pb-28">
       <div className="flex items-center justify-between gap-3">
         <div>
           <Link to="/admin" className="text-xs underline text-muted">
@@ -386,8 +387,26 @@ export default function PecaEditar() {
         </div>
       </details>
 
+      {!novo && (
+        <button
+          type="button"
+          onClick={async () => {
+            if (!id || !window.confirm(`Excluir "${f.nome}" de vez? As fotos também serão apagadas.`)) return
+            try {
+              await excluirProduto(id)
+              navigate('/admin', { replace: true })
+            } catch {
+              setMsg({ tipo: 'erro', texto: 'Não foi possível excluir.' })
+            }
+          }}
+          className="self-center min-h-[44px] px-4 text-sm text-[#A3361F] underline"
+        >
+          Excluir esta peça
+        </button>
+      )}
+
       {/* BARRA DE SALVAR */}
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-line z-20">
+      <div className="fixed bottom-16 md:bottom-0 inset-x-0 bg-white border-t border-line z-20" style={{ marginBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
           {msg && (
             <span role="status" className={`text-sm flex-1 ${msg.tipo === 'ok' ? 'text-[#25502A]' : 'text-[#A3361F]'}`}>

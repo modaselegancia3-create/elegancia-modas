@@ -92,7 +92,7 @@ export default function Aparencia() {
   }
 
   return (
-    <form onSubmit={salvar} className="flex flex-col gap-6 pb-28">
+    <form onSubmit={salvar} className="flex flex-col gap-6 pb-36 md:pb-28">
       <div>
         <h1 className="font-serif text-4xl">Aparência da loja</h1>
         <p className="text-sm text-muted">Tudo o que aparece na página inicial e no rodapé.</p>
@@ -227,7 +227,7 @@ export default function Aparencia() {
         </div>
       </Secao>
 
-      <div className="fixed bottom-0 inset-x-0 bg-white border-t border-line z-20">
+      <div className="fixed bottom-16 md:bottom-0 inset-x-0 bg-white border-t border-line z-20" style={{ marginBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
           {msg && (
             <span role="status" className={`text-sm flex-1 ${msg.ok ? 'text-[#25502A]' : 'text-[#A3361F]'}`}>

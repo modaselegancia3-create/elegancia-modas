@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
 import { souAdmin } from '../../lib/admin'
+import { IcLoja, IcLista, IcMais, IcPecas, IcPincel, IcSair } from './IconesAdmin'
 
 type Estado = 'carregando' | 'sem-login' | 'sem-permissao' | 'ok'
 
@@ -58,47 +59,75 @@ export default function LayoutAdmin() {
     )
   }
 
-  const item = 'px-3 min-h-[40px] inline-flex items-center text-xs tracking-[0.12em] uppercase border-b-2'
+  const abas = [
+    { to: '/admin', end: true, label: 'Peças', Icone: IcPecas },
+    { to: '/admin/peca/nova', end: false, label: 'Nova peça', Icone: IcMais },
+    { to: '/admin/aparencia', end: false, label: 'Aparência', Icone: IcPincel },
+    { to: '/admin/categorias', end: false, label: 'Categorias', Icone: IcLista },
+  ]
+
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="min-h-screen bg-[#FAF8F5] pb-20 md:pb-0">
       <header className="bg-ink text-[#E9DCC2] sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <Link to="/admin" className="flex items-center gap-2">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <Link to="/admin" className="flex items-center gap-2.5">
             <img src="/logo.png" alt="" className="w-8 h-8" />
-            <span className="font-serif text-lg tracking-[0.14em]">PAINEL</span>
+            <span className="font-serif text-lg tracking-[0.16em]">PAINEL</span>
           </Link>
-          <div className="flex items-center gap-3 text-xs">
-            <a href="/" target="_blank" rel="noreferrer" className="underline text-[#E9DCC2]">
-              Ver loja
+
+          {/* abas no computador */}
+          <nav aria-label="Seções do painel" className="hidden md:flex gap-1">
+            {abas.map(({ to, end, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                end={end}
+                className={({ isActive }) =>
+                  `px-3 h-14 inline-flex items-center text-xs tracking-[0.12em] uppercase border-b-2 ${
+                    isActive ? 'border-goldl text-white' : 'border-transparent text-[#CFC3AE] hover:text-white'
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-1">
+            <a href="/" target="_blank" rel="noreferrer" aria-label="Ver a loja" className="w-11 h-11 inline-flex items-center justify-center text-[#E9DCC2]">
+              <IcLoja />
             </a>
-            <button onClick={sair} className="min-h-[40px] px-3 border border-[#6B5E48] uppercase tracking-[0.12em]">
-              Sair
+            <button onClick={sair} aria-label="Sair do painel" className="w-11 h-11 inline-flex items-center justify-center">
+              <IcSair />
             </button>
           </div>
         </div>
-        <nav aria-label="Seções do painel" className="bg-white text-ink border-b border-line">
-          <div className="max-w-6xl mx-auto px-2 flex gap-1 overflow-x-auto sem-barra">
-            <NavLink to="/admin" end className={({ isActive }) => `${item} ${isActive ? 'border-ink' : 'border-transparent'}`}>
-              Peças
-            </NavLink>
-            <NavLink to="/admin/peca/nova" className={({ isActive }) => `${item} ${isActive ? 'border-ink' : 'border-transparent'}`}>
-              + Nova peça
-            </NavLink>
-            <NavLink to="/admin/aparencia" className={({ isActive }) => `${item} ${isActive ? 'border-ink' : 'border-transparent'}`}>
-              Aparência
-            </NavLink>
-            <NavLink to="/admin/categorias" className={({ isActive }) => `${item} ${isActive ? 'border-ink' : 'border-transparent'}`}>
-              Categorias
-            </NavLink>
-            <span className={`${item} border-transparent text-[#B5AFA6]`} title="Chega na Etapa 5">
-              Pedidos (em breve)
-            </span>
-          </div>
-        </nav>
       </header>
-      <main className="max-w-6xl mx-auto px-4 py-6">
+
+      <main className="max-w-5xl mx-auto px-4 py-5 md:py-8">
         <Outlet />
       </main>
+
+      {/* menu inferior no celular */}
+      <nav
+        aria-label="Seções do painel"
+        className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-line grid grid-cols-4"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        {abas.map(({ to, end, label, Icone }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `h-16 flex flex-col items-center justify-center gap-1 text-[11px] ${isActive ? 'text-ink font-medium' : 'text-[#8F887E]'}`
+            }
+          >
+            <Icone />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
     </div>
   )
 }
