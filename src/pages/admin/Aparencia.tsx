@@ -16,6 +16,8 @@ const rotulo = 'min-w-0 flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase
 
 type BlocoId = 'avisos' | 'banners' | 'tamanho' | 'lancamentos' | 'videos' | 'maisvendidos' | 'outlet' | 'look' | 'editorial' | 'loja'
 
+const pctDe = (v: string | null | undefined) => (v && /^\d+$/.test(v) ? Number(v) : v === 'topo' ? 0 : v === 'baixo' ? 100 : 50)
+
 function Enquadramento({ valor, onChange, id }: { valor: string; onChange: (v: string) => void; id: string }) {
   const n = /^\d+$/.test(valor) ? Number(valor) : valor === 'topo' ? 0 : valor === 'baixo' ? 100 : 50
   return (
@@ -258,12 +260,19 @@ export default function Aparencia() {
         {banners.map((b, i) => (
           <div key={b.id ?? `n${i}`} className="border border-line min-w-0">
             <div className="flex items-center gap-2 p-2">
-              <div className="w-14 h-14 bg-[#F3F1EE] shrink-0 overflow-hidden">
-                {(b.foto_mobile_url || b.foto_url) && <img src={b.foto_mobile_url || b.foto_url || ''} alt="" className="w-full h-full object-cover" />}
-              </div>
+              <button type="button" onClick={() => setBannerAberto((x) => (x === i ? null : i))} aria-label="Editar banner" className="w-12 h-[60px] bg-[#F3F1EE] shrink-0 overflow-hidden">
+                {(b.foto_mobile_url || b.foto_url) && (
+                  <img
+                    src={b.foto_mobile_url || b.foto_url || ''}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: `center ${pctDe(b.foto_mobile_url ? b.posicao_mobile : b.posicao)}%` }}
+                  />
+                )}
+              </button>
               <button type="button" onClick={() => setBannerAberto((x) => (x === i ? null : i))} className="flex-1 min-w-0 text-left min-h-[44px]">
                 <span className="block text-sm truncate">{b.titulo || `Banner ${i + 1}`}</span>
-                <span className="block text-xs text-muted">{bannerAberto === i ? 'Fechar' : 'Toque para editar'}</span>
+                <span className="block text-xs text-muted">{bannerAberto === i ? 'Fechar' : '✎ Editar foto e textos'}</span>
               </button>
               <input type="checkbox" aria-label="Mostrar este banner" className="w-5 h-5 accent-ink shrink-0" checked={b.ativo} onChange={(e) => setBanner(i, { ativo: e.target.checked })} />
               <Controles
@@ -279,12 +288,28 @@ export default function Aparencia() {
               <div className="border-t border-line p-3 flex flex-col gap-4 min-w-0">
                 <div className="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-5">
                   <div className="flex flex-col gap-3 min-w-0">
-                    <CampoFoto rotulo="Foto do banner" dica="Aparece no celular e no computador." valor={b.foto_url} onChange={(u) => setBanner(i, { foto_url: u })} proporcao="16/9" posicao={posicaoCss(b.posicao)} />
-                    <Enquadramento id={`bd-${i}`} valor={b.posicao} onChange={(v) => setBanner(i, { posicao: v })} />
+                    <CampoFoto
+                      rotulo="Foto do banner"
+                      dica="A prévia mostra exatamente como fica no celular."
+                      valor={b.foto_url}
+                      onChange={(u) => setBanner(i, { foto_url: u })}
+                      proporcao="4/5"
+                      pct={pctDe(b.posicao)}
+                      onPct={(n) => setBanner(i, { posicao: String(n) })}
+                    />
+                    {b.foto_url && <Enquadramento id={`bd-${i}`} valor={b.posicao} onChange={(v) => setBanner(i, { posicao: v })} />}
                   </div>
                   <div className="flex flex-col gap-3 min-w-0">
-                    <CampoFoto rotulo="Outra foto só para o celular" dica="Opcional. Em pé." valor={b.foto_mobile_url} onChange={(u) => setBanner(i, { foto_mobile_url: u })} proporcao="9/16" posicao={posicaoCss(b.foto_mobile_url ? b.posicao_mobile : b.posicao)} />
-                    <Enquadramento id={`bm-${i}`} valor={b.posicao_mobile} onChange={(v) => setBanner(i, { posicao_mobile: v })} />
+                    <CampoFoto
+                      rotulo="Outra foto só para o celular"
+                      dica="Opcional. Se colocar, o celular usa esta."
+                      valor={b.foto_mobile_url}
+                      onChange={(u) => setBanner(i, { foto_mobile_url: u })}
+                      proporcao="4/5"
+                      pct={pctDe(b.posicao_mobile)}
+                      onPct={(n) => setBanner(i, { posicao_mobile: String(n) })}
+                    />
+                    {b.foto_mobile_url && <Enquadramento id={`bm-${i}`} valor={b.posicao_mobile} onChange={(v) => setBanner(i, { posicao_mobile: v })} />}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

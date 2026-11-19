@@ -57,7 +57,7 @@ export default function Banners() {
           return (
             <div
               key={b.id ?? i}
-              className="relative shrink-0 w-full snap-center h-[calc(100svh-64px-36px)] md:h-[80vh] min-h-[480px] overflow-hidden"
+              className="relative shrink-0 w-full snap-center aspect-[4/5] md:aspect-auto md:h-[80vh] md:min-h-[480px] overflow-hidden"
               style={{ background: claro ? '#1B1A18' : '#EDEAE6' }}
               aria-roledescription="slide"
               aria-label={`${i + 1} de ${qtd}`}
