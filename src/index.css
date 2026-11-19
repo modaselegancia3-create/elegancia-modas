@@ -61,3 +61,7 @@ button:disabled { cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) {
   .abertura *, .animar-entrada, .animar-capa { animation-duration: .01s !important; animation-delay: 0s !important; }
 }
+
+/* Enquadramento da capa (celular x computador), definido no painel */
+.capa-foto { object-position: var(--pos-mobile, center); }
+@media (min-width: 768px) { .capa-foto { object-position: var(--pos-desk, center); } }

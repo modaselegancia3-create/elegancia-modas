@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
 import { dinheiro, parcelas } from '../lib/format'
 
 export default function Sacola() {
   const { itens, subtotal, quantidadeTotal, alterarQuantidade, remover } = useSacola()
+  const { config } = useConfig()
 
   if (itens.length === 0) {
     return (
@@ -88,7 +90,7 @@ export default function Sacola() {
             <span>Total</span>
             <strong className="font-medium">{dinheiro(subtotal)}</strong>
           </div>
-          <span className="text-xs text-muted -mt-2">ou {parcelas(subtotal)}</span>
+          <span className="text-xs text-muted -mt-2">ou {parcelas(subtotal, config.parcelas_sem_juros)}</span>
           <button
             type="button"
             disabled

@@ -1,18 +1,20 @@
 # Elegância Confecções — Loja online
 
-Etapa 1: banco de dados + vitrine (abertura, início, produto, sacola).
+## Etapas
+- [x] Etapa 1: banco de dados + vitrine (abertura, início, produto, sacola)
+- [x] Etapa 2: painel da loja (/admin) — peças, fotos padronizadas, grade/estoque, aparência, categorias
+- [ ] Etapa 3: checkout + Mercado Pago (Pix e cartão) + baixa de estoque
+- [ ] Etapa 4: frete para todo o Brasil
+- [ ] Etapa 5: pedidos, avisos e área da cliente
+- [ ] Etapa 6: domínio próprio e lançamento
+
+## Banco (Supabase › SQL Editor)
+1. `supabase/schema.sql`
+2. `supabase/02_painel.sql` (depois de criar o usuário admin@eleganciamodas.com em Authentication › Users)
+
+## Painel
+Endereço: /admin — login com o usuário criado no Supabase.
+As fotos de peças são padronizadas no navegador (3:4, 1200x1600, luz corrigida) antes de enviar.
 
 ## Rodar no computador
-1. `npm install`
-2. Copie `.env.example` para `.env` e preencha com a URL e a anon key do Supabase.
-3. `npm run dev` e abra http://localhost:5173
-
-## Banco de dados
-Cole `supabase/schema.sql` no SQL Editor do Supabase e clique em RUN.
-
-## Próximas etapas
-- Etapa 2: painel da loja (login, cadastro de peças com fotos, grade e estoque)
-- Etapa 3: checkout + Mercado Pago (Pix e cartão) + baixa de estoque automática
-- Etapa 4: frete para todo o Brasil
-- Etapa 5: pedidos, avisos e área da cliente
-- Etapa 6: domínio próprio e lançamento
+`npm install` → copiar `.env.example` para `.env` → `npm run dev`

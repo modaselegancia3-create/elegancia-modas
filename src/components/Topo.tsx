@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
+import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
 import { IconeSacola } from './Icones'
 
@@ -13,11 +14,14 @@ const LINKS = [
 
 export default function Topo() {
   const { quantidadeTotal } = useSacola()
+  const { config } = useConfig()
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-line">
-      <div className="bg-ink text-[#E9DCC2] text-[11px] tracking-[0.2em] uppercase text-center py-2 px-4">
-        Enviamos para todo o Brasil · Do P ao XG
-      </div>
+      {config.aviso_topo && (
+        <div className="bg-ink text-[#E9DCC2] text-[11px] tracking-[0.2em] uppercase text-center py-2 px-4">
+          {config.aviso_topo}
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="flex items-center gap-3 no-underline">
           <img src="/logo.png" alt="" className="w-10 h-10" />

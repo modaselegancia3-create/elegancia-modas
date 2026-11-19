@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useConfig } from '../context/ConfigContext'
 import type { Produto } from '../types'
 import { emEstoque, fotoCapa } from '../lib/catalogo'
 import { dinheiro, parcelas, precoFinal } from '../lib/format'
 
 export default function CardProduto({ p }: { p: Produto }) {
+  const { config } = useConfig()
   const preco = precoFinal(p)
   const promo = preco < p.preco
   const esgotado = !emEstoque(p)
@@ -37,7 +39,7 @@ export default function CardProduto({ p }: { p: Produto }) {
         {promo && <s className="text-muted mr-2">{dinheiro(p.preco)}</s>}
         {dinheiro(preco)}
       </span>
-      <span className="text-xs text-muted">{parcelas(preco)}</span>
+      <span className="text-xs text-muted">{parcelas(preco, config.parcelas_sem_juros)}</span>
     </article>
   )
 }

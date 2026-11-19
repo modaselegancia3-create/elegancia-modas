@@ -1,11 +1,14 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import CardProduto from '../components/CardProduto'
+import { useConfig } from '../context/ConfigContext'
+import { posicaoCss } from '../lib/config'
 import { buscarCategorias, buscarProdutos } from '../lib/catalogo'
 import type { Categoria, Produto } from '../types'
 
 export default function Inicio() {
   const [params, setParams] = useSearchParams()
+  const { config } = useConfig()
   const cat = params.get('cat') ?? ''
   const [produtos, setProdutos] = useState<Produto[] | null>(null)
   const [categorias, setCategorias] = useState<Categoria[]>([])
@@ -29,7 +32,8 @@ export default function Inicio() {
   }, [produtos, cat])
 
   const titulo = cat ? categorias.find((c) => c.slug === cat)?.nome ?? 'Peças' : 'Novidades'
-  const destaque = produtos?.find((p) => p.destaque) ?? produtos?.[0]
+  const destaque =
+    produtos?.find((p) => p.id === config.look_produto_id) ?? produtos?.find((p) => p.destaque) ?? produtos?.[0]
 
   function escolher(slug: string) {
     if (slug) setParams({ cat: slug })
@@ -39,21 +43,41 @@ export default function Inicio() {
 
   return (
     <>
-      {/* CAPA */}
-      <section className="relative h-[calc(100svh-64px-40px)] md:h-[78vh] min-h-[520px] bg-[#EDEAE6] overflow-hidden">
-        <img
-          src="/demo/bege.jpg"
-          alt="Vestido halter bege da coleção Verão 27"
-          className="absolute inset-0 w-full h-full object-cover animar-capa"
-        />
-        <div className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-center px-4">
-          <span className="font-serif text-[clamp(44px,12vw,104px)] leading-none tracking-[0.12em]">ELEGÂNCIA</span>
-          <a
-            href="#vitrine"
-            className="bg-white text-[11px] tracking-[0.32em] uppercase px-4 py-2.5 min-h-[44px] inline-flex items-center"
-          >
-            Coleção Verão 27
-          </a>
+      {/* CAPA (editável no painel › Aparência) */}
+      <section
+        className="relative h-[calc(100svh-64px-40px)] md:h-[82vh] min-h-[520px] overflow-hidden"
+        style={{ background: config.capa_cor_texto === 'claro' ? '#1B1A18' : '#EDEAE6' }}
+      >
+        <picture>
+          {config.capa_foto_mobile_url && <source media="(max-width: 767px)" srcSet={config.capa_foto_mobile_url} />}
+          <img
+            src={config.capa_foto_url || '/demo/bege.jpg'}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover animar-capa capa-foto"
+            style={
+              {
+                '--pos-mobile': posicaoCss(config.capa_foto_mobile_url ? config.capa_posicao_mobile : config.capa_posicao),
+                '--pos-desk': posicaoCss(config.capa_posicao),
+              } as CSSProperties
+            }
+          />
+        </picture>
+        <div
+          className={`absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-center px-4 ${
+            config.capa_cor_texto === 'claro' ? 'text-white' : 'text-ink'
+          }`}
+        >
+          {config.capa_titulo && (
+            <span className="font-serif text-[clamp(44px,12vw,104px)] leading-none tracking-[0.12em]">{config.capa_titulo}</span>
+          )}
+          {config.capa_botao && (
+            <a
+              href="#vitrine"
+              className="bg-white text-ink text-[11px] tracking-[0.32em] uppercase px-4 py-2.5 min-h-[44px] inline-flex items-center"
+            >
+              {config.capa_botao}
+            </a>
+          )}
         </div>
       </section>
 
@@ -108,10 +132,8 @@ export default function Inicio() {
             <img src={destaque.fotos[0]?.url ?? '/logo.png'} alt={destaque.nome} className="w-full max-w-md aspect-[3/4] object-cover" />
             <div className="flex flex-col gap-4">
               <span className="text-[11px] tracking-[0.3em] uppercase text-gold">Look da semana</span>
-              <h2 className="font-serif text-4xl md:text-5xl leading-tight">Monte o look completo</h2>
-              <p className="text-muted leading-relaxed">
-                {destaque.nome} com acessórios escolhidos pela loja. Combine as peças e finalize tudo numa compra só.
-              </p>
+              <h2 className="font-serif text-4xl md:text-5xl leading-tight">{config.look_titulo || destaque.nome}</h2>
+              {config.look_texto && <p className="text-muted leading-relaxed">{config.look_texto}</p>}
               <Link
                 to={`/produto/${destaque.slug}`}
                 className="self-start inline-flex items-center min-h-[52px] px-8 bg-ink text-white text-xs tracking-[0.16em] uppercase"
@@ -123,15 +145,21 @@ export default function Inicio() {
         </section>
       )}
 
-      {/* TENDÊNCIAS */}
-      <section className="max-w-6xl mx-auto px-4 pt-14 grid md:grid-cols-2 gap-8 items-center">
-        <img src="/demo/tend.jpg" alt="Quatro looks de tendência do verão" className="w-full aspect-[4/3] object-cover" />
-        <div className="flex flex-col gap-3">
-          <span className="text-[11px] tracking-[0.3em] uppercase text-gold">Editorial</span>
-          <h2 className="font-serif text-4xl">4 tendências do verão</h2>
-          <p className="text-muted leading-relaxed">Peplum, listras, poá e jeans wide leg.</p>
-        </div>
-      </section>
+      {/* EDITORIAL (editável no painel) */}
+      {config.editorial_ativo && (config.editorial_titulo || config.editorial_foto_url) && (
+        <section className="max-w-6xl mx-auto px-4 pt-14 grid md:grid-cols-2 gap-8 items-center">
+          {config.editorial_foto_url && (
+            <img src={config.editorial_foto_url} alt="" className="w-full aspect-[4/3] object-cover" />
+          )}
+          <div className="flex flex-col gap-3">
+            {config.editorial_selo && (
+              <span className="text-[11px] tracking-[0.3em] uppercase text-gold">{config.editorial_selo}</span>
+            )}
+            {config.editorial_titulo && <h2 className="font-serif text-4xl">{config.editorial_titulo}</h2>}
+            {config.editorial_texto && <p className="text-muted leading-relaxed">{config.editorial_texto}</p>}
+          </div>
+        </section>
+      )}
     </>
   )
 }

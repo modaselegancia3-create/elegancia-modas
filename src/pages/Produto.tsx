@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import CardProduto from '../components/CardProduto'
 import { IconeVoltar } from '../components/Icones'
+import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
 import { buscarProduto, buscarProdutos, fotoCapa } from '../lib/catalogo'
 import { dinheiro, ordenarTamanhos, parcelas, precoFinal } from '../lib/format'
@@ -11,6 +12,7 @@ export default function Produto() {
   const { slug = '' } = useParams()
   const navigate = useNavigate()
   const { adicionar } = useSacola()
+  const { config } = useConfig()
   const [p, setP] = useState<TProduto | null | undefined>(undefined)
   const [outros, setOutros] = useState<TProduto[]>([])
   const [cor, setCor] = useState('')
@@ -147,7 +149,7 @@ export default function Produto() {
               {promo && <s className="text-muted text-base mr-2">{dinheiro(p.preco)}</s>}
               {dinheiro(preco)}
             </div>
-            <div className="text-sm text-muted">ou {parcelas(preco)} · Pix e cartão via Mercado Pago</div>
+            <div className="text-sm text-muted">ou {parcelas(preco, config.parcelas_sem_juros)} · Pix e cartão via Mercado Pago</div>
           </div>
 
           {cores.length > 1 && (

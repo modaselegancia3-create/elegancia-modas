@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
 import { linkWhats } from '../lib/whatsapp'
 import { IconeInicio, IconeMenu, IconeSacola, IconeWhats } from './Icones'
@@ -6,6 +7,7 @@ import { IconeInicio, IconeMenu, IconeSacola, IconeWhats } from './Icones'
 
 export default function MenuInferior() {
   const { quantidadeTotal } = useSacola()
+  const { config } = useConfig()
   const cls = 'flex flex-col items-center justify-center gap-1 text-[10px] tracking-[0.14em] uppercase'
   return (
     <nav
@@ -32,7 +34,7 @@ export default function MenuInferior() {
         </span>
         Sacola
       </NavLink>
-      <a href={linkWhats()} target="_blank" rel="noreferrer" className={cls}>
+      <a href={linkWhats(undefined, config.whatsapp)} target="_blank" rel="noreferrer" className={cls}>
         <IconeWhats />
         WhatsApp
       </a>
