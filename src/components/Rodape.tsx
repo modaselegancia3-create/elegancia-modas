@@ -1,4 +1,4 @@
-const WHATS = (import.meta.env.VITE_WHATSAPP as string | undefined) ?? ''
+import { linkWhats } from '../lib/whatsapp'
 
 export default function Rodape() {
   return (
@@ -13,7 +13,7 @@ export default function Rodape() {
         </div>
         <div className="flex flex-col gap-2 text-sm">
           <span className="text-[11px] tracking-[0.24em] uppercase text-goldl mb-1">Atendimento</span>
-          <a href={`https://wa.me/${WHATS}`} target="_blank" rel="noreferrer" className="text-[#E9DCC2]">
+          <a href={linkWhats()} target="_blank" rel="noreferrer" className="text-[#E9DCC2]">
             WhatsApp da loja
           </a>
           <a href="https://instagram.com/eleganciaa_modass" target="_blank" rel="noreferrer" className="text-[#E9DCC2]">

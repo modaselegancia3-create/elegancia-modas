@@ -1,8 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import { useSacola } from '../context/SacolaContext'
+import { linkWhats } from '../lib/whatsapp'
 import { IconeInicio, IconeMenu, IconeSacola, IconeWhats } from './Icones'
 
-const WHATS = (import.meta.env.VITE_WHATSAPP as string | undefined) ?? ''
 
 export default function MenuInferior() {
   const { quantidadeTotal } = useSacola()
@@ -32,7 +32,7 @@ export default function MenuInferior() {
         </span>
         Sacola
       </NavLink>
-      <a href={`https://wa.me/${WHATS}`} target="_blank" rel="noreferrer" className={cls}>
+      <a href={linkWhats()} target="_blank" rel="noreferrer" className={cls}>
         <IconeWhats />
         WhatsApp
       </a>
