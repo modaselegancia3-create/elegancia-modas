@@ -112,6 +112,10 @@ export default function Aparencia() {
           filtro_tamanho_titulo: c.filtro_tamanho_titulo || null,
           videos_ativo: c.videos_ativo,
           videos_titulo: c.videos_titulo || null,
+          videos_botao_texto: c.videos_botao_texto || null,
+          videos_curtir: c.videos_curtir,
+          videos_whatsapp: c.videos_whatsapp,
+          videos_compartilhar: c.videos_compartilhar,
           look_ativo: c.look_ativo,
           lancamentos_ativo: c.lancamentos_ativo,
           lancamentos_titulo: c.lancamentos_titulo || null,
@@ -147,7 +151,7 @@ export default function Aparencia() {
       setMsg({ ok: true, t: 'Salvo! O site já está atualizado.' })
     } catch (err) {
       console.error(err)
-      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se os arquivos 03_vitrine.sql e 04_secoes.sql foram rodados no Supabase.' })
+      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se os arquivos 03 a 06 da pasta supabase foram rodados no Supabase.' })
     } finally {
       setSalvando(false)
     }
@@ -320,7 +324,28 @@ export default function Aparencia() {
           Título da seção
           <input className={campo} value={c.videos_titulo ?? ''} onChange={(e) => set('videos_titulo', e.target.value)} />
         </label>
-        <p className="text-xs text-muted">Vídeos em pé, de até 30 segundos (máx. 50 MB). A música do vídeo toca quando a cliente abre.</p>
+        <label className={rotulo}>
+          Texto do botão de compra
+          <input className={campo} value={c.videos_botao_texto ?? ''} onChange={(e) => set('videos_botao_texto', e.target.value)} placeholder="Adicionar ao carrinho" />
+        </label>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs tracking-[0.1em] uppercase text-muted">Botões redondos ao lado do vídeo</span>
+          <div className="flex flex-wrap gap-x-5">
+            <label className="flex items-center gap-2 text-sm min-h-[44px]">
+              <input type="checkbox" className="w-5 h-5 accent-ink" checked={c.videos_curtir} onChange={(e) => set('videos_curtir', e.target.checked)} />
+              Curtir ♡
+            </label>
+            <label className="flex items-center gap-2 text-sm min-h-[44px]">
+              <input type="checkbox" className="w-5 h-5 accent-ink" checked={c.videos_whatsapp} onChange={(e) => set('videos_whatsapp', e.target.checked)} />
+              WhatsApp
+            </label>
+            <label className="flex items-center gap-2 text-sm min-h-[44px]">
+              <input type="checkbox" className="w-5 h-5 accent-ink" checked={c.videos_compartilhar} onChange={(e) => set('videos_compartilhar', e.target.checked)} />
+              Compartilhar
+            </label>
+          </div>
+        </div>
+        <p className="text-xs text-muted">Vídeos em pé, de até 30 segundos (máx. 50 MB). A música do vídeo toca quando a cliente abre. Escolha a peça de cada vídeo para aparecer o preço e o botão de compra.</p>
         {videos.map((v, i) => (
           <div key={v.id ?? `n${i}`} className="border border-line p-2 flex gap-3 min-w-0">
             <video src={v.video_url} poster={v.capa_url ?? undefined} muted playsInline preload="metadata" className="w-20 aspect-[9/16] object-cover bg-black shrink-0" />

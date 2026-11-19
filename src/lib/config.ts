@@ -38,6 +38,10 @@ export type Config = {
   maisvendidos_titulo: string | null
   outlet_ativo: boolean
   outlet_titulo: string | null
+  videos_botao_texto: string | null
+  videos_curtir: boolean
+  videos_whatsapp: boolean
+  videos_compartilhar: boolean
 }
 
 export const CONFIG_PADRAO: Config = {
@@ -78,6 +82,10 @@ export const CONFIG_PADRAO: Config = {
   maisvendidos_titulo: 'Mais vendidos',
   outlet_ativo: true,
   outlet_titulo: 'Outlet',
+  videos_botao_texto: 'Adicionar ao carrinho',
+  videos_curtir: true,
+  videos_whatsapp: true,
+  videos_compartilhar: true,
 }
 
 export async function buscarConfig(): Promise<Config> {

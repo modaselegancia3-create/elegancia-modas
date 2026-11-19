@@ -24,7 +24,6 @@ export default function Produto() {
     setP(undefined)
     setTamanho('')
     setAviso('')
-    window.scrollTo(0, 0)
     buscarProduto(slug)
       .then((prod) => {
         setP(prod)

@@ -1,8 +1,8 @@
-import { useEffect } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Abertura from './components/Abertura'
 import LayoutAdmin from './components/admin/LayoutAdmin'
 import MenuInferior from './components/MenuInferior'
+import Navegacao from './components/Navegacao'
 import Rodape from './components/Rodape'
 import Topo from './components/Topo'
 import Aparencia from './pages/admin/Aparencia'
@@ -16,14 +16,6 @@ import Inicio from './pages/Inicio'
 import NaoEncontrado from './pages/NaoEncontrado'
 import Produto from './pages/Produto'
 import Sacola from './pages/Sacola'
-
-function RolarParaTopo() {
-  const { pathname } = useLocation()
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-  return null
-}
 
 function Loja() {
   return (
@@ -49,7 +41,7 @@ function Loja() {
 export default function App() {
   return (
     <>
-      <RolarParaTopo />
+      <Navegacao />
       <Routes>
         <Route path="/admin/login" element={<Login />} />
         <Route path="/admin" element={<LayoutAdmin />}>

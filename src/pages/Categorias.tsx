@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { buscarCategorias } from '../lib/catalogo'
+import { buscarCategorias, buscarProdutos } from '../lib/catalogo'
 import type { Categoria } from '../types'
 
 export default function Categorias() {
   const [cats, setCats] = useState<Categoria[]>([])
   useEffect(() => {
-    buscarCategorias().then(setCats).catch(console.error)
+    Promise.all([buscarCategorias(), buscarProdutos()])
+      .then(([c, p]) => {
+        const comPecas = new Set(p.map((x) => x.categoria?.slug).filter(Boolean))
+        setCats(c.filter((k) => comPecas.has(k.slug)))
+      })
+      .catch(console.error)
   }, [])
   return (
     <section className="max-w-xl mx-auto px-4 py-8">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useConfig } from '../context/ConfigContext'
-import { buscarCategorias } from '../lib/catalogo'
+import { buscarCategorias, buscarProdutos } from '../lib/catalogo'
 import { linkWhats } from '../lib/whatsapp'
 import type { Categoria } from '../types'
 import { IconeFechar, IconeSacola, IconeWhats } from './Icones'
@@ -28,7 +28,12 @@ export default function MenuLateral({ aberto, onFechar }: { aberto: boolean; onF
   const insta = (config.instagram ?? '').replace(/^@/, '')
 
   useEffect(() => {
-    buscarCategorias().then(setCats).catch(console.error)
+    Promise.all([buscarCategorias(), buscarProdutos()])
+      .then(([c, p]) => {
+        const comPecas = new Set(p.map((x) => x.categoria?.slug).filter(Boolean))
+        setCats(c.filter((k) => comPecas.has(k.slug)))
+      })
+      .catch(console.error)
   }, [])
 
   // fecha ao navegar

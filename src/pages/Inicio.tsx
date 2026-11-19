@@ -88,7 +88,8 @@ export default function Inicio() {
   const filtroTamanho = config.filtro_tamanho_ativo && tamanhosDisponiveis.length > 0 && (
     <section className="bg-[#F4F2EF] py-8 px-4 text-center">
       {config.filtro_tamanho_titulo && <h2 className="text-xl md:text-2xl font-light mb-5">{config.filtro_tamanho_titulo}</h2>}
-      <div className="flex gap-2.5 overflow-x-auto sem-barra md:justify-center -mx-4 px-4" role="group" aria-label="Filtrar por tamanho">
+      <div className="overflow-x-auto sem-barra -mx-4 px-4">
+      <div className="flex gap-2.5 w-max mx-auto" role="group" aria-label="Filtrar por tamanho">
         {tamanhosDisponiveis.map((t) => (
           <button
             key={t}
@@ -102,6 +103,7 @@ export default function Inicio() {
             {t}
           </button>
         ))}
+      </div>
       </div>
     </section>
   )
@@ -124,10 +126,7 @@ export default function Inicio() {
           {!produtos && !erro && <Esqueleto />}
           {erro && <p className="text-sm text-[#A3361F]">{erro}</p>}
           {produtos && resultado.length === 0 && (
-            <div className="py-12 text-center text-sm text-muted flex flex-col items-center gap-4">
-              Nenhuma peça encontrada.
-              <Link to="/" className="underline">Voltar para o início</Link>
-            </div>
+            <p className="py-6 text-center text-sm text-muted">Em breve novidades aqui. Enquanto isso, veja o que acabou de chegar:</p>
           )}
           {resultado.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-x-3 md:gap-x-5 gap-y-10">
@@ -137,6 +136,7 @@ export default function Inicio() {
             </div>
           )}
         </section>
+        {produtos && resultado.length === 0 && <Vitrine titulo={config.lancamentos_titulo || 'Lançamentos'} produtos={lancamentos} />}
       </>
     )
   }
