@@ -42,6 +42,9 @@ export type Config = {
   videos_curtir: boolean
   videos_whatsapp: boolean
   videos_compartilhar: boolean
+  lancamentos_ids: string[]
+  mais_vendidos_ids: string[]
+  outlet_ids: string[]
 }
 
 export const CONFIG_PADRAO: Config = {
@@ -86,6 +89,9 @@ export const CONFIG_PADRAO: Config = {
   videos_curtir: true,
   videos_whatsapp: true,
   videos_compartilhar: true,
+  lancamentos_ids: [],
+  mais_vendidos_ids: [],
+  outlet_ids: [],
 }
 
 export async function buscarConfig(): Promise<Config> {

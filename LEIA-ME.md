@@ -15,6 +15,7 @@
 4. `supabase/04_secoes.sql` (vitrines Lançamentos, Mais vendidos, Outlet)
 5. `supabase/05_exemplos.sql` (exemplos)
 6. `supabase/06_videos.sql` (opções dos vídeos)
+7. `supabase/07_selecao.sql` (peças escolhidas nas vitrines e % do outlet)
 
 ## Painel
 Endereço: /admin — login com o usuário criado no Supabase.

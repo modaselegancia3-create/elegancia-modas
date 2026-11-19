@@ -35,9 +35,27 @@ export default function Inicio() {
   }, [])
 
   const todos = produtos ?? []
-  const lancamentos = useMemo(() => todos.filter(emEstoque).slice(0, 12), [todos])
-  const maisVendidos = useMemo(() => todos.filter((p) => p.destaque && emEstoque(p)), [todos])
-  const outlet = useMemo(() => todos.filter((p) => precoFinal(p) < p.preco && emEstoque(p)), [todos])
+  // peças escolhidas no painel (na ordem escolhida); sem escolha = automático
+  const escolhidas = (ids: string[] | null | undefined) =>
+    (ids ?? []).map((id) => todos.find((p) => p.id === id)).filter((p): p is Produto => !!p && emEstoque(p))
+  const lancamentos = useMemo(
+    () => (config.lancamentos_ids?.length ? escolhidas(config.lancamentos_ids) : todos.filter(emEstoque).slice(0, 12)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todos, config.lancamentos_ids],
+  )
+  const maisVendidos = useMemo(
+    () => (config.mais_vendidos_ids?.length ? escolhidas(config.mais_vendidos_ids) : todos.filter((p) => p.destaque && emEstoque(p))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todos, config.mais_vendidos_ids],
+  )
+  const outlet = useMemo(
+    () =>
+      config.outlet_ids?.length
+        ? escolhidas(config.outlet_ids).filter((p) => precoFinal(p) < p.preco)
+        : todos.filter((p) => precoFinal(p) < p.preco && emEstoque(p)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todos, config.outlet_ids],
+  )
 
   // modo filtrado: categoria, tamanho ou "ver tudo" de uma vitrine
   const filtrando = !!(cat || tam || vit)

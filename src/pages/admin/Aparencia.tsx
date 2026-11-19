@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import Bloco, { Controles, mover } from '../../components/admin/Bloco'
 import CampoFoto from '../../components/admin/CampoFoto'
+import SeletorPecas, { type PecaResumo } from '../../components/admin/SeletorPecas'
 import { useConfig } from '../../context/ConfigContext'
 import { enviarVideo } from '../../lib/admin'
 import { buscarCategorias } from '../../lib/catalogo'
@@ -45,9 +46,11 @@ export default function Aparencia() {
   const [avisos, setAvisos] = useState<Aviso[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [videos, setVideos] = useState<Video[]>([])
-  const [produtos, setProdutos] = useState<{ id: string; nome: string; preco: number; preco_promocional: number | null; foto: string | null }[]>([])
+  const [produtos, setProdutos] = useState<PecaResumo[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [aberto, setAberto] = useState<BlocoId | null>(null)
+  const [descontos, setDescontos] = useState<Record<string, number>>({})
+  const outletInicial = useRef<string[]>([])
   const [bannerAberto, setBannerAberto] = useState<number | null>(null)
   const [enviandoVideo, setEnviandoVideo] = useState(0)
   const [salvando, setSalvando] = useState(false)
@@ -58,6 +61,7 @@ export default function Aparencia() {
     Promise.all([buscarConfig(), buscarAvisos(true), buscarBanners(true), buscarVideos(true), buscarCategorias()]).then(
       ([cfg, a, b, v, cats]) => {
         setC(cfg)
+        outletInicial.current = cfg.outlet_ids ?? []
         setAvisos(a)
         setBanners(b)
         setVideos(v)
@@ -79,6 +83,18 @@ export default function Aparencia() {
           })),
         ),
       )
+    supabase
+      .from('produtos')
+      .select('id,preco,preco_promocional')
+      .then(({ data }) => {
+        const d: Record<string, number> = {}
+        ;((data as any[]) ?? []).forEach((p) => {
+          const preco = Number(p.preco)
+          const promo = p.preco_promocional == null ? null : Number(p.preco_promocional)
+          if (promo && promo < preco) d[p.id] = Math.round((1 - promo / preco) * 100)
+        })
+        setDescontos(d)
+      })
   }, [])
 
   if (!c) return <p className="text-sm text-muted">Carregando…</p>
@@ -134,6 +150,9 @@ export default function Aparencia() {
           mais_vendidos_titulo: c.mais_vendidos_titulo || null,
           outlet_ativo: c.outlet_ativo,
           outlet_titulo: c.outlet_titulo || null,
+          lancamentos_ids: c.lancamentos_ids ?? [],
+          mais_vendidos_ids: c.mais_vendidos_ids ?? [],
+          outlet_ids: c.outlet_ids ?? [],
           look_produto_id: c.look_produto_id || null,
           look_titulo: c.look_titulo || null,
           look_texto: c.look_texto || null,
@@ -152,6 +171,19 @@ export default function Aparencia() {
         })
         .eq('id', 1)
       if (error) throw error
+      // Outlet: aplica o % de desconto em cada peça escolhida e tira a promoção das que saíram
+      for (const id of c.outlet_ids ?? []) {
+        const pr = produtos.find((x) => x.id === id)
+        const pct = descontos[id] ?? 0
+        if (!pr) continue
+        const promo = pct > 0 ? Math.round(pr.preco * (1 - pct / 100) * 100) / 100 : null
+        const { error: ePromo } = await supabase.from('produtos').update({ preco_promocional: promo }).eq('id', id)
+        if (ePromo) throw ePromo
+      }
+      for (const id of outletInicial.current.filter((x) => !(c.outlet_ids ?? []).includes(x))) {
+        await supabase.from('produtos').update({ preco_promocional: null }).eq('id', id)
+      }
+      outletInicial.current = c.outlet_ids ?? []
       await sincronizarLista('avisos', avisos.filter((a) => a.texto.trim()))
       await sincronizarLista('banners', banners)
       await sincronizarLista('videos', videos)
@@ -162,7 +194,7 @@ export default function Aparencia() {
       setMsg({ ok: true, t: 'Salvo! O site já está atualizado.' })
     } catch (err) {
       console.error(err)
-      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se os arquivos 03 a 06 da pasta supabase foram rodados no Supabase.' })
+      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se os arquivos 03 a 07 da pasta supabase foram rodados no Supabase.' })
     } finally {
       setSalvando(false)
     }
@@ -309,7 +341,7 @@ export default function Aparencia() {
       {/* LANÇAMENTOS */}
       <Bloco
         titulo="Lançamentos"
-        resumo="As peças cadastradas mais recentemente, com estoque"
+        resumo={c.lancamentos_ids?.length ? `${c.lancamentos_ids.length} peças escolhidas` : 'Automático: peças mais recentes'}
         aberto={aberto === 'lancamentos'}
         onAbrir={() => abrir('lancamentos')}
         noSite={c.lancamentos_ativo}
@@ -319,7 +351,12 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.lancamentos_titulo ?? ''} onChange={(e) => set('lancamentos_titulo', e.target.value)} />
         </label>
-        <p className="text-xs text-muted">As peças cadastradas mais recentemente, com estoque.</p>
+        <SeletorPecas
+          pecas={produtos}
+          selecionadas={c.lancamentos_ids ?? []}
+          onChange={(v) => set('lancamentos_ids', v)}
+          automatico="o site mostra as 12 peças mais recentes com estoque."
+        />
       </Bloco>
 
       {/* VÍDEOS */}
@@ -412,7 +449,7 @@ export default function Aparencia() {
       {/* MAIS VENDIDOS */}
       <Bloco
         titulo="Mais vendidos"
-        resumo="As peças marcadas com a estrela (Destaque) na lista de peças"
+        resumo={c.mais_vendidos_ids?.length ? `${c.mais_vendidos_ids.length} peças escolhidas` : 'Automático: peças com estrela'}
         aberto={aberto === 'maisvendidos'}
         onAbrir={() => abrir('maisvendidos')}
         noSite={c.mais_vendidos_ativo}
@@ -422,13 +459,18 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.mais_vendidos_titulo ?? ''} onChange={(e) => set('mais_vendidos_titulo', e.target.value)} />
         </label>
-        <p className="text-xs text-muted">As peças marcadas com a estrela (Destaque) na lista de peças.</p>
+        <SeletorPecas
+          pecas={produtos}
+          selecionadas={c.mais_vendidos_ids ?? []}
+          onChange={(v) => set('mais_vendidos_ids', v)}
+          automatico="o site mostra as peças marcadas com a estrela (Destaque)."
+        />
       </Bloco>
 
       {/* OUTLET */}
       <Bloco
         titulo="Outlet"
-        resumo="As peças com preço promocional, com a etiqueta de % OFF"
+        resumo={c.outlet_ids?.length ? `${c.outlet_ids.length} peças escolhidas` : 'Automático: peças com preço promocional'}
         aberto={aberto === 'outlet'}
         onAbrir={() => abrir('outlet')}
         noSite={c.outlet_ativo}
@@ -438,7 +480,14 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.outlet_titulo ?? ''} onChange={(e) => set('outlet_titulo', e.target.value)} />
         </label>
-        <p className="text-xs text-muted">As peças com preço promocional, com a etiqueta de % OFF.</p>
+        <SeletorPecas
+          pecas={produtos}
+          selecionadas={c.outlet_ids ?? []}
+          onChange={(v) => set('outlet_ids', v)}
+          automatico="o site mostra as peças que já têm preço promocional."
+          descontos={descontos}
+          onDesconto={(id, pct) => setDescontos((d) => ({ ...d, [id]: pct }))}
+        />
       </Bloco>
 
       {/* LOOK DA SEMANA */}
