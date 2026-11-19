@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
 import { souAdmin } from '../../lib/admin'
+import Login from '../../pages/admin/Login'
 import { useAppPainel } from './AppPainel'
 import { IcLoja, IcLista, IcMais, IcPecas, IcPincel, IcSair } from './IconesAdmin'
 
@@ -34,16 +35,15 @@ export default function LayoutAdmin() {
     }
   }, [])
 
-  useEffect(() => {
-    if (estado === 'sem-login') navigate('/admin/login', { replace: true, state: { voltar: pathname } })
-  }, [estado, navigate, pathname])
 
   async function sair() {
     await supabase.auth.signOut()
-    navigate('/admin/login', { replace: true })
+    navigate('/admin', { replace: true })
   }
 
-  if (estado === 'carregando' || estado === 'sem-login') {
+  if (estado === 'sem-login') return <Login />
+
+  if (estado === 'carregando') {
     return <div className="min-h-screen flex items-center justify-center text-sm text-muted">Carregando painel…</div>
   }
 

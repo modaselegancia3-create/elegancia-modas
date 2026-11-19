@@ -23,7 +23,8 @@ export default function Login() {
       setErro('E-mail ou senha incorretos.')
       return
     }
-    navigate(voltar.startsWith('/admin/login') ? '/admin' : voltar, { replace: true })
+    // no /admin o painel aparece sozinho quando o login confirma
+    if (location.pathname.startsWith('/admin/login')) navigate(voltar.startsWith('/admin/login') ? '/admin' : voltar, { replace: true })
   }
 
   return (
