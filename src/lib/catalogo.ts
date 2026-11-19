@@ -1,12 +1,24 @@
 import { supabase } from './supabase'
 import type { Categoria, Produto } from '../types'
 
-const SELECT = `
-  id, nome, slug, descricao, preco, preco_promocional, promo_inicio, promo_fim, promo_riscado, destaque, criado_em,
+const BASE = `
+  id, nome, slug, descricao, preco, preco_promocional, destaque, criado_em,
   categoria:categorias ( nome, slug ),
   fotos:produto_fotos ( url, ordem ),
   variantes ( id, cor, cor_hex, tamanho, estoque )
 `
+const COMPLETO = BASE.replace('preco_promocional,', 'preco_promocional, promo_inicio, promo_fim, promo_riscado,')
+
+/** Usa as colunas novas de promoção; se o banco ainda não tiver (SQL 07 não rodado), segue sem elas. */
+let SELECT = COMPLETO
+async function comFallback<T>(consulta: (sel: string) => PromiseLike<{ data: T; error: any }>) {
+  let r = await consulta(SELECT)
+  if (r.error && SELECT === COMPLETO && /promo_/.test(r.error.message ?? '')) {
+    SELECT = BASE
+    r = await consulta(SELECT)
+  }
+  return r
+}
 
 function normalizar(row: any): Produto {
   return {
@@ -20,22 +32,17 @@ function normalizar(row: any): Produto {
 }
 
 export async function buscarProdutos(): Promise<Produto[]> {
-  const { data, error } = await supabase
-    .from('produtos')
-    .select(SELECT)
-    .eq('ativo', true)
-    .order('criado_em', { ascending: false })
+  const { data, error } = await comFallback((sel) =>
+    supabase.from('produtos').select(sel).eq('ativo', true).order('criado_em', { ascending: false }),
+  )
   if (error) throw error
   return (data ?? []).map(normalizar)
 }
 
 export async function buscarProduto(slug: string): Promise<Produto | null> {
-  const { data, error } = await supabase
-    .from('produtos')
-    .select(SELECT)
-    .eq('slug', slug)
-    .eq('ativo', true)
-    .maybeSingle()
+  const { data, error } = await comFallback((sel) =>
+    supabase.from('produtos').select(sel).eq('slug', slug).eq('ativo', true).maybeSingle(),
+  )
   if (error) throw error
   return data ? normalizar(data) : null
 }
