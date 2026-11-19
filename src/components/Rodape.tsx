@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useConfig } from '../context/ConfigContext'
 import { linkWhats } from '../lib/whatsapp'
 
@@ -32,9 +33,14 @@ export default function Rodape() {
           <span className="text-[#CFC3AE]">Enviamos para todo o Brasil</span>
         </div>
       </div>
-      <div className="border-t border-[#3A352E] text-center text-xs text-[#A79E90] py-5 px-4">
-        {config.nome_loja}
-        {config.cnpj ? ` · CNPJ ${config.cnpj}` : ''} · Pontalina-GO
+      <div className="border-t border-[#3A352E] text-center text-xs text-[#A79E90] py-5 px-4 flex flex-col items-center gap-3">
+        <span>
+          {config.nome_loja}
+          {config.cnpj ? ` · CNPJ ${config.cnpj}` : ''} · Pontalina-GO
+        </span>
+        <Link to="/admin" className="text-[#6F675C] underline min-h-[32px] inline-flex items-center">
+          Área da loja
+        </Link>
       </div>
     </footer>
   )
