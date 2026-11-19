@@ -55,7 +55,7 @@ export function VideosVitrine({ videos, titulo }: { videos: VideoComProduto[]; t
             }`}
           >
             <video
-              src={v.video_url}
+              src={`${v.video_url}#t=0.1`}
               poster={v.capa_url ?? undefined}
               muted
               loop

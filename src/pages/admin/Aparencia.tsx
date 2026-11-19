@@ -4,6 +4,7 @@ import CampoFoto from '../../components/admin/CampoFoto'
 import { useConfig } from '../../context/ConfigContext'
 import { enviarVideo } from '../../lib/admin'
 import { buscarCategorias } from '../../lib/catalogo'
+import { dinheiro } from '../../lib/format'
 import { buscarConfig, posicaoCss, type Config } from '../../lib/config'
 import { supabase } from '../../lib/supabase'
 import { buscarAvisos, buscarBanners, buscarVideos, sincronizarLista, type Aviso, type Banner, type Video } from '../../lib/vitrine'
@@ -44,7 +45,7 @@ export default function Aparencia() {
   const [avisos, setAvisos] = useState<Aviso[]>([])
   const [banners, setBanners] = useState<Banner[]>([])
   const [videos, setVideos] = useState<Video[]>([])
-  const [produtos, setProdutos] = useState<{ id: string; nome: string }[]>([])
+  const [produtos, setProdutos] = useState<{ id: string; nome: string; preco: number; preco_promocional: number | null; foto: string | null }[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [aberto, setAberto] = useState<BlocoId | null>(null)
   const [bannerAberto, setBannerAberto] = useState<number | null>(null)
@@ -65,9 +66,19 @@ export default function Aparencia() {
     )
     supabase
       .from('produtos')
-      .select('id,nome')
+      .select('id,nome,preco,preco_promocional, fotos:produto_fotos(url,ordem)')
       .order('nome')
-      .then(({ data }) => setProdutos((data as { id: string; nome: string }[]) ?? []))
+      .then(({ data }) =>
+        setProdutos(
+          ((data as any[]) ?? []).map((p) => ({
+            id: p.id,
+            nome: p.nome,
+            preco: Number(p.preco),
+            preco_promocional: p.preco_promocional == null ? null : Number(p.preco_promocional),
+            foto: [...(p.fotos ?? [])].sort((a: any, b: any) => a.ordem - b.ordem)[0]?.url ?? null,
+          })),
+        ),
+      )
   }, [])
 
   if (!c) return <p className="text-sm text-muted">Carregando…</p>
@@ -348,7 +359,7 @@ export default function Aparencia() {
         <p className="text-xs text-muted">Vídeos em pé, de até 30 segundos (máx. 50 MB). A música do vídeo toca quando a cliente abre. Escolha a peça de cada vídeo para aparecer o preço e o botão de compra.</p>
         {videos.map((v, i) => (
           <div key={v.id ?? `n${i}`} className="border border-line p-2 flex gap-3 min-w-0">
-            <video src={v.video_url} poster={v.capa_url ?? undefined} muted playsInline preload="metadata" className="w-20 aspect-[9/16] object-cover bg-black shrink-0" />
+            <video src={`${v.video_url}#t=0.5`} poster={v.capa_url ?? undefined} muted playsInline preload="metadata" className="w-20 aspect-[9/16] object-cover bg-black shrink-0" />
             <div className="flex-1 min-w-0 flex flex-col gap-2">
               <label className={rotulo}>
                 Peça do vídeo
@@ -361,6 +372,19 @@ export default function Aparencia() {
                   ))}
                 </select>
               </label>
+              {(() => {
+                const pr = produtos.find((x) => x.id === v.produto_id)
+                if (!pr) return <p className="text-xs text-[#A3361F]">Sem peça: o vídeo aparece sem preço e sem botão de compra.</p>
+                const final = pr.preco_promocional && pr.preco_promocional < pr.preco ? pr.preco_promocional : pr.preco
+                return (
+                  <div className="flex items-center gap-2 bg-[#F6F4F1] p-2">
+                    {pr.foto && <img src={pr.foto} alt="" className="w-9 h-11 object-cover" />}
+                    <span className="text-xs text-muted">Preço no vídeo:</span>
+                    <strong className="text-sm">{dinheiro(final)}</strong>
+                    {final < pr.preco && <s className="text-xs text-muted">{dinheiro(pr.preco)}</s>}
+                  </div>
+                )
+              })()}
               <div className="flex items-center justify-between gap-2 flex-wrap">
                 <label className="flex items-center gap-1.5 text-xs text-muted min-h-[36px]">
                   <input type="checkbox" className="w-5 h-5 accent-ink" checked={v.ativo} onChange={(e) => setVideo(i, { ativo: e.target.checked })} />
