@@ -222,7 +222,7 @@ export default function PecaEditar() {
             required
           />
         </label>
-        <label className={rotulo}>
+        <label className={`${rotulo} md:col-span-2`}>
           Categoria
           <select className={campo} value={f.categoria_id} onChange={(e) => set('categoria_id', e.target.value)}>
             <option value="">Sem categoria</option>
@@ -232,10 +232,6 @@ export default function PecaEditar() {
               </option>
             ))}
           </select>
-        </label>
-        <label className={rotulo}>
-          Endereço da peça no site
-          <input className={campo} value={f.slug} onChange={(e) => set('slug', slugify(e.target.value))} placeholder="gerado pelo nome" />
         </label>
         <label className={rotulo}>
           Preço (R$)
