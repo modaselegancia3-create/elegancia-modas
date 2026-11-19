@@ -30,7 +30,7 @@ export default function Avisos() {
   )
 
   return (
-    <div className="bg-ink text-[#E9DCC2] text-[11px] tracking-[0.2em] uppercase text-center h-9 px-4 flex items-center justify-center overflow-hidden" aria-live="polite">
+    <div className="bg-black text-[#E9DCC2] border-b border-[#2A2621] text-[11px] tracking-[0.2em] uppercase text-center h-9 px-4 flex items-center justify-center overflow-hidden" aria-live="polite">
       {atual.link ? <a href={atual.link}>{conteudo}</a> : conteudo}
     </div>
   )

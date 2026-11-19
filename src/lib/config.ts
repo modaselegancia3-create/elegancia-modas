@@ -32,6 +32,12 @@ export type Config = {
   videos_ativo: boolean
   videos_titulo: string | null
   look_ativo: boolean
+  lancamentos_ativo: boolean
+  lancamentos_titulo: string | null
+  maisvendidos_ativo: boolean
+  maisvendidos_titulo: string | null
+  outlet_ativo: boolean
+  outlet_titulo: string | null
 }
 
 export const CONFIG_PADRAO: Config = {
@@ -66,6 +72,12 @@ export const CONFIG_PADRAO: Config = {
   videos_ativo: true,
   videos_titulo: 'Descubra cada detalhe em vídeo',
   look_ativo: true,
+  lancamentos_ativo: true,
+  lancamentos_titulo: 'Lançamentos',
+  maisvendidos_ativo: true,
+  maisvendidos_titulo: 'Mais vendidos',
+  outlet_ativo: true,
+  outlet_titulo: 'Outlet',
 }
 
 export async function buscarConfig(): Promise<Config> {

@@ -74,8 +74,14 @@ export default function MenuLateral({ aberto, onFechar }: { aberto: boolean; onF
 
         <div className="flex-1 overflow-y-auto">
           <Link to="/" className={item}>
-            Lançamentos
+            Início
           </Link>
+
+          {cats.map((c) => (
+            <Link key={c.id} to={`/?cat=${c.slug}`} className={item}>
+              {c.nome}
+            </Link>
+          ))}
 
           <button type="button" onClick={() => setColecoes((x) => !x)} aria-expanded={colecoes} className={`${item} w-full text-left`}>
             Coleções
@@ -83,19 +89,23 @@ export default function MenuLateral({ aberto, onFechar }: { aberto: boolean; onF
           </button>
           {colecoes && (
             <div className="bg-[#FAF9F7] border-b border-line">
-              {cats.map((c) => (
-                <Link key={c.id} to={`/?cat=${c.slug}`} className="flex items-center min-h-[50px] px-9 text-[15px]">
-                  {c.nome}
+              {config.lancamentos_ativo && (
+                <Link to="/?vitrine=lancamentos" className="flex items-center min-h-[50px] px-9 text-[15px]">
+                  {config.lancamentos_titulo || 'Lançamentos'}
                 </Link>
-              ))}
+              )}
+              {config.mais_vendidos_ativo && (
+                <Link to="/?vitrine=mais-vendidos" className="flex items-center min-h-[50px] px-9 text-[15px]">
+                  {config.mais_vendidos_titulo || 'Mais vendidos'}
+                </Link>
+              )}
+              {config.outlet_ativo && (
+                <Link to="/?vitrine=outlet" className="flex items-center min-h-[50px] px-9 text-[15px]">
+                  {config.outlet_titulo || 'Outlet'}
+                </Link>
+              )}
             </div>
           )}
-
-          {cats.slice(0, 4).map((c) => (
-            <Link key={c.id} to={`/?cat=${c.slug}`} className={item}>
-              {c.nome}
-            </Link>
-          ))}
 
           <Link to="/sacola" className={item}>
             Sacola

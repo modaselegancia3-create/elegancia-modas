@@ -12,7 +12,7 @@ import type { Categoria } from '../../types'
 const campo = 'border border-[#CFCAC2] bg-white px-3 py-3 text-base w-full min-w-0 max-w-full rounded-none'
 const rotulo = 'min-w-0 flex flex-col gap-1.5 text-xs tracking-[0.1em] uppercase text-muted'
 
-type BlocoId = 'avisos' | 'banners' | 'tamanho' | 'videos' | 'look' | 'editorial' | 'loja'
+type BlocoId = 'avisos' | 'banners' | 'tamanho' | 'lancamentos' | 'videos' | 'maisvendidos' | 'outlet' | 'look' | 'editorial' | 'loja'
 
 function Enquadramento({ valor, onChange, id }: { valor: string; onChange: (v: string) => void; id: string }) {
   const n = /^\d+$/.test(valor) ? Number(valor) : valor === 'topo' ? 0 : valor === 'baixo' ? 100 : 50
@@ -113,6 +113,12 @@ export default function Aparencia() {
           videos_ativo: c.videos_ativo,
           videos_titulo: c.videos_titulo || null,
           look_ativo: c.look_ativo,
+          lancamentos_ativo: c.lancamentos_ativo,
+          lancamentos_titulo: c.lancamentos_titulo || null,
+          mais_vendidos_ativo: c.mais_vendidos_ativo,
+          mais_vendidos_titulo: c.mais_vendidos_titulo || null,
+          outlet_ativo: c.outlet_ativo,
+          outlet_titulo: c.outlet_titulo || null,
           look_produto_id: c.look_produto_id || null,
           look_titulo: c.look_titulo || null,
           look_texto: c.look_texto || null,
@@ -141,7 +147,7 @@ export default function Aparencia() {
       setMsg({ ok: true, t: 'Salvo! O site já está atualizado.' })
     } catch (err) {
       console.error(err)
-      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se o arquivo 03_vitrine.sql foi rodado no Supabase.' })
+      setMsg({ ok: false, t: 'Não foi possível salvar. Confira se os arquivos 03_vitrine.sql e 04_secoes.sql foram rodados no Supabase.' })
     } finally {
       setSalvando(false)
     }
@@ -271,7 +277,7 @@ export default function Aparencia() {
 
       {/* FILTRO POR TAMANHO */}
       <Bloco
-        titulo="Filtrar por tamanho"
+        titulo="Filtrar por numeração"
         resumo="Bolinhas com os tamanhos que têm estoque"
         aberto={aberto === 'tamanho'}
         onAbrir={() => abrir('tamanho')}
@@ -283,6 +289,22 @@ export default function Aparencia() {
           <input className={campo} value={c.filtro_tamanho_titulo ?? ''} onChange={(e) => set('filtro_tamanho_titulo', e.target.value)} />
         </label>
         <p className="text-xs text-muted">Os tamanhos aparecem sozinhos, de acordo com o estoque das peças.</p>
+      </Bloco>
+
+      {/* LANÇAMENTOS */}
+      <Bloco
+        titulo="Lançamentos"
+        resumo="As peças cadastradas mais recentemente, com estoque"
+        aberto={aberto === 'lancamentos'}
+        onAbrir={() => abrir('lancamentos')}
+        noSite={c.lancamentos_ativo}
+        onNoSite={(v) => set('lancamentos_ativo', v)}
+      >
+        <label className={rotulo}>
+          Título
+          <input className={campo} value={c.lancamentos_titulo ?? ''} onChange={(e) => set('lancamentos_titulo', e.target.value)} />
+        </label>
+        <p className="text-xs text-muted">As peças cadastradas mais recentemente, com estoque.</p>
       </Bloco>
 
       {/* VÍDEOS */}
@@ -336,6 +358,38 @@ export default function Aparencia() {
           + Adicionar vídeos
         </button>
         <input ref={inputVideo} type="file" accept="video/*" multiple onChange={adicionarVideos} className="hidden" />
+      </Bloco>
+
+      {/* MAIS VENDIDOS */}
+      <Bloco
+        titulo="Mais vendidos"
+        resumo="As peças marcadas com a estrela (Destaque) na lista de peças"
+        aberto={aberto === 'maisvendidos'}
+        onAbrir={() => abrir('maisvendidos')}
+        noSite={c.mais_vendidos_ativo}
+        onNoSite={(v) => set('mais_vendidos_ativo', v)}
+      >
+        <label className={rotulo}>
+          Título
+          <input className={campo} value={c.mais_vendidos_titulo ?? ''} onChange={(e) => set('mais_vendidos_titulo', e.target.value)} />
+        </label>
+        <p className="text-xs text-muted">As peças marcadas com a estrela (Destaque) na lista de peças.</p>
+      </Bloco>
+
+      {/* OUTLET */}
+      <Bloco
+        titulo="Outlet"
+        resumo="As peças com preço promocional, com a etiqueta de % OFF"
+        aberto={aberto === 'outlet'}
+        onAbrir={() => abrir('outlet')}
+        noSite={c.outlet_ativo}
+        onNoSite={(v) => set('outlet_ativo', v)}
+      >
+        <label className={rotulo}>
+          Título
+          <input className={campo} value={c.outlet_titulo ?? ''} onChange={(e) => set('outlet_titulo', e.target.value)} />
+        </label>
+        <p className="text-xs text-muted">As peças com preço promocional, com a etiqueta de % OFF.</p>
       </Bloco>
 
       {/* LOOK DA SEMANA */}

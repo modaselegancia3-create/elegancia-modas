@@ -13,18 +13,44 @@ export type VideoComProduto = Video & { produto: Produto | null }
 /* ---------------- fileira de vídeos na página inicial ---------------- */
 export function VideosVitrine({ videos, titulo }: { videos: VideoComProduto[]; titulo: string | null }) {
   const [aberto, setAberto] = useState<number | null>(null)
+  const [ativo, setAtivo] = useState(0)
+  const trilho = useRef<HTMLDivElement>(null)
+
+  function aoRolar() {
+    const el = trilho.current
+    if (!el) return
+    const centro = el.scrollLeft + el.clientWidth / 2
+    let melhor = 0
+    let dist = Infinity
+    Array.from(el.children).forEach((filho, i) => {
+      const c = filho as HTMLElement
+      const d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - centro)
+      if (d < dist) {
+        dist = d
+        melhor = i
+      }
+    })
+    setAtivo(melhor)
+  }
+
   if (!videos.length) return null
   return (
     <section className="mt-14">
-      {titulo && <h2 className="font-serif text-3xl md:text-4xl text-center px-4 mb-5">{titulo}</h2>}
-      <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory sem-barra px-4 md:justify-center">
+      {titulo && <h2 className="text-xl md:text-2xl font-semibold text-center px-4 mb-5">{titulo}</h2>}
+      <div
+        ref={trilho}
+        onScroll={aoRolar}
+        className="flex items-center gap-3 overflow-x-auto snap-x snap-mandatory sem-barra px-[19vw] md:px-[calc(50%-150px)]"
+      >
         {videos.map((v, i) => (
           <button
             key={v.id ?? i}
             type="button"
             onClick={() => setAberto(i)}
             aria-label={`Assistir vídeo${v.produto ? ` de ${v.produto.nome}` : ''}`}
-            className="relative shrink-0 snap-center w-[46vw] max-w-[230px] aspect-[9/16] overflow-hidden rounded-xl bg-[#EDEAE6] text-left"
+            className={`relative shrink-0 snap-center w-[62vw] max-w-[300px] aspect-[9/16] overflow-hidden rounded-xl bg-[#EDEAE6] text-left transition-transform duration-300 ${
+              i === ativo ? 'scale-100' : 'scale-[0.86] opacity-80'
+            }`}
           >
             <video
               src={v.video_url}
@@ -37,11 +63,11 @@ export function VideosVitrine({ videos, titulo }: { videos: VideoComProduto[]; t
               className="absolute inset-0 w-full h-full object-cover"
             />
             {v.produto && (
-              <span className="absolute left-2 right-2 bottom-2 bg-white/90 backdrop-blur rounded-lg p-1.5 flex items-center gap-2">
-                <img src={fotoCapa(v.produto)} alt="" className="w-9 h-11 object-cover rounded" />
+              <span className="absolute left-2.5 right-2.5 bottom-2.5 bg-white/90 backdrop-blur rounded-lg p-2 flex items-center gap-2.5">
+                <img src={fotoCapa(v.produto)} alt="" className="w-10 h-12 object-cover rounded" />
                 <span className="min-w-0 flex flex-col">
-                  <span className="text-[11px] leading-tight line-clamp-1">{v.produto.nome}</span>
-                  <span className="text-xs font-medium">{dinheiro(precoFinal(v.produto))}</span>
+                  <span className="text-xs leading-tight line-clamp-1">{v.produto.nome}</span>
+                  <span className="text-sm font-semibold">{dinheiro(precoFinal(v.produto))}</span>
                 </span>
               </span>
             )}
