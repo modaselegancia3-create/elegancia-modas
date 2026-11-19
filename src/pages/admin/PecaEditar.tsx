@@ -341,15 +341,34 @@ export default function PecaEditar() {
                     </th>
                     {tamanhosOrdenados.map((t) => (
                       <td key={t} className="p-1.5 text-center">
-                        <input
-                          type="number"
-                          min={0}
-                          inputMode="numeric"
-                          aria-label={`Estoque ${c.nome} ${t}`}
-                          value={f.estoque[`${c.nome}|${t}`] ?? 0}
-                          onChange={(e) => mudarEstoque(c.nome, t, e.target.value)}
-                          className="w-16 border border-[#CFCAC2] px-2 py-2 text-center"
-                        />
+                        <div className="inline-flex flex-col items-center border border-[#CFCAC2] w-14">
+                          <button
+                            type="button"
+                            aria-label={`Aumentar estoque ${c.nome} ${t}`}
+                            onClick={() => mudarEstoque(c.nome, t, String((f.estoque[`${c.nome}|${t}`] ?? 0) + 1))}
+                            className="w-full h-9 flex items-center justify-center bg-[#F4F2EF] active:bg-ink active:text-white"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+                          </button>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            aria-label={`Estoque ${c.nome} ${t}`}
+                            value={f.estoque[`${c.nome}|${t}`] ?? 0}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => mudarEstoque(c.nome, t, e.target.value.replace(/\D/g, ''))}
+                            className="w-full py-1.5 text-center text-base font-medium border-y border-[#CFCAC2] outline-none"
+                          />
+                          <button
+                            type="button"
+                            aria-label={`Diminuir estoque ${c.nome} ${t}`}
+                            onClick={() => mudarEstoque(c.nome, t, String(Math.max(0, (f.estoque[`${c.nome}|${t}`] ?? 0) - 1)))}
+                            className="w-full h-9 flex items-center justify-center bg-[#F4F2EF] active:bg-ink active:text-white"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                          </button>
+                        </div>
                       </td>
                     ))}
                   </tr>
