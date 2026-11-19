@@ -28,6 +28,85 @@ function Enquadramento({ valor, onChange, id }: { valor: string; onChange: (v: s
   )
 }
 
+const SUGESTOES_TAMANHO = ['PP', 'P', 'M', 'G', 'GG', 'XG', 'XGG', '36', '38', '40', '42', '44', '46', '48', 'Único']
+
+/** Bolinhas do "Filtrar por numeração": marca/desmarca, ordena e cria tamanhos novos. */
+function EditorTamanhos({ valor, onChange }: { valor: string[]; onChange: (v: string[]) => void }) {
+  const [novo, setNovo] = useState('')
+  const opcoes = [...SUGESTOES_TAMANHO, ...valor.filter((t) => !SUGESTOES_TAMANHO.includes(t))]
+  const alternar = (t: string) => onChange(valor.includes(t) ? valor.filter((x) => x !== t) : [...valor, t])
+  const mover = (i: number, d: number) => {
+    const j = i + d
+    if (j < 0 || j >= valor.length) return
+    const l = [...valor]
+    ;[l[i], l[j]] = [l[j], l[i]]
+    onChange(l)
+  }
+  function adicionar() {
+    const t = novo.trim().toUpperCase()
+    if (t && !valor.includes(t)) onChange([...valor, t])
+    setNovo('')
+  }
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        <span className="text-xs tracking-[0.1em] uppercase text-muted">Toque para marcar os tamanhos que aparecem</span>
+        <div className="flex flex-wrap gap-2">
+          {opcoes.map((t) => {
+            const on = valor.includes(t)
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={() => alternar(t)}
+                aria-pressed={on}
+                className={`min-w-[48px] h-12 px-3 rounded-full border text-sm ${on ? 'bg-ink text-white border-ink' : 'bg-white border-[#CFCAC2]'}`}
+              >
+                {t}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <input
+          className={campo}
+          value={novo}
+          onChange={(e) => setNovo(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              adicionar()
+            }
+          }}
+          placeholder="Outro tamanho (ex.: EG, 50)"
+        />
+        <button type="button" onClick={adicionar} className="shrink-0 min-h-[44px] px-4 border border-ink text-xs uppercase tracking-[0.12em]">
+          Adicionar
+        </button>
+      </div>
+      {valor.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <span className="text-xs tracking-[0.1em] uppercase text-muted">Ordem no site</span>
+          {valor.map((t, i) => (
+            <div key={t} className="flex items-center gap-2 border border-line px-3 min-h-[48px]">
+              <span className="flex-1 font-medium">{t}</span>
+              <button type="button" onClick={() => mover(i, -1)} disabled={i === 0} aria-label={`Subir ${t}`} className="w-10 h-10 disabled:opacity-25">↑</button>
+              <button type="button" onClick={() => mover(i, 1)} disabled={i === valor.length - 1} aria-label={`Descer ${t}`} className="w-10 h-10 disabled:opacity-25">↓</button>
+              <button type="button" onClick={() => alternar(t)} aria-label={`Tirar ${t}`} className="w-10 h-10 text-[#A3361F]">✕</button>
+            </div>
+          ))}
+          <button type="button" onClick={() => onChange([])} className="self-start text-xs underline text-muted min-h-[40px]">
+            Voltar para automático
+          </button>
+        </div>
+      ) : (
+        <p className="text-xs text-muted">Nenhum marcado: o site mostra sozinho os tamanhos que têm estoque.</p>
+      )}
+    </div>
+  )
+}
+
 const bannerNovo = (): Banner => ({
   foto_url: null,
   foto_mobile_url: null,
@@ -138,13 +217,12 @@ export default function Aparencia() {
     setSalvando(true)
     setMsg(null)
     try {
-      const { error } = await supabase
-        .from('configuracoes')
-        .update({
+      const dados: Record<string, unknown> = {
           avisos_ativo: c.avisos_ativo,
           banners_ativo: c.banners_ativo,
           filtro_tamanho_ativo: c.filtro_tamanho_ativo,
           filtro_tamanho_titulo: c.filtro_tamanho_titulo || null,
+          filtro_tamanhos: c.filtro_tamanhos ?? [],
           videos_ativo: c.videos_ativo,
           videos_titulo: c.videos_titulo || null,
           videos_botao_texto: c.videos_botao_texto || null,
@@ -179,8 +257,13 @@ export default function Aparencia() {
           cnpj: c.cnpj || null,
           sobre_texto: c.sobre_texto || null,
           parcelas_sem_juros: Math.min(12, Math.max(1, Number(c.parcelas_sem_juros) || 1)),
-        })
-        .eq('id', 1)
+      }
+      let { error } = await supabase.from('configuracoes').update(dados).eq('id', 1)
+      if (error && /filtro_tamanhos/.test(error.message)) {
+        // arquivo 08 ainda não rodado: salva o resto mesmo assim
+        delete dados.filtro_tamanhos
+        ;({ error } = await supabase.from('configuracoes').update(dados).eq('id', 1))
+      }
       if (error) throw error
       // Outlet: aplica o % de desconto em cada peça escolhida e tira a promoção das que saíram
       for (const id of c.outlet_ids ?? []) {
@@ -362,7 +445,7 @@ export default function Aparencia() {
       {/* FILTRO POR TAMANHO */}
       <Bloco
         titulo="Filtrar por numeração"
-        resumo="Bolinhas com os tamanhos que têm estoque"
+        resumo={c.filtro_tamanhos?.length ? c.filtro_tamanhos.join(" · ") : "Automático (tamanhos com estoque)"}
         aberto={aberto === 'tamanho'}
         onAbrir={() => abrir('tamanho')}
         noSite={c.filtro_tamanho_ativo}
@@ -372,7 +455,7 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.filtro_tamanho_titulo ?? ''} onChange={(e) => set('filtro_tamanho_titulo', e.target.value)} />
         </label>
-        <p className="text-xs text-muted">Os tamanhos aparecem sozinhos, de acordo com o estoque das peças.</p>
+        <EditorTamanhos valor={c.filtro_tamanhos ?? []} onChange={(v) => set('filtro_tamanhos', v)} />
       </Bloco>
 
       {/* LANÇAMENTOS */}

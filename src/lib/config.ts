@@ -29,6 +29,7 @@ export type Config = {
   banners_ativo: boolean
   filtro_tamanho_ativo: boolean
   filtro_tamanho_titulo: string | null
+  filtro_tamanhos: string[] | null
   videos_ativo: boolean
   videos_titulo: string | null
   look_ativo: boolean
@@ -79,6 +80,7 @@ export const CONFIG_PADRAO: Config = {
   banners_ativo: true,
   filtro_tamanho_ativo: true,
   filtro_tamanho_titulo: 'Filtrar por tamanho',
+  filtro_tamanhos: [],
   videos_ativo: true,
   videos_titulo: 'Descubra cada detalhe em vídeo',
   look_ativo: true,

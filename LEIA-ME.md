@@ -16,6 +16,7 @@
 5. `supabase/05_exemplos.sql` (exemplos)
 6. `supabase/06_videos.sql` (opções dos vídeos)
 7. `supabase/07_selecao.sql` (peças escolhidas nas vitrines e % do outlet)
+8. `supabase/08_tamanhos.sql` (tamanhos do filtro escolhidos no painel)
 
 ## Painel
 Endereço: /admin — login com o usuário criado no Supabase.

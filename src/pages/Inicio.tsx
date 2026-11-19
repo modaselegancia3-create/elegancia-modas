@@ -67,10 +67,12 @@ export default function Inicio() {
   }, [todos, cat, vit, maisVendidos, outlet])
 
   const tamanhosDisponiveis = useMemo(() => {
+    // escolhidos no painel (na ordem escolhida); sem escolha = automático pelo estoque
+    if (config.filtro_tamanhos?.length) return config.filtro_tamanhos
     const s = new Set<string>()
     ;(filtrando ? base : todos).forEach((p) => p.variantes.forEach((v) => v.estoque > 0 && s.add(v.tamanho)))
     return Array.from(s).sort(ordenarTamanhos)
-  }, [base, todos, filtrando])
+  }, [base, todos, filtrando, config.filtro_tamanhos])
 
   const resultado = useMemo(
     () => (tam ? base.filter((p) => p.variantes.some((v) => v.tamanho === tam && v.estoque > 0)) : base),
