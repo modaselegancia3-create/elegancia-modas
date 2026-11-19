@@ -67,6 +67,6 @@ button:disabled { cursor: not-allowed; }
 @media (min-width: 768px) { .capa-foto { object-position: var(--pos-desk, center); } }
 
 /* Nunca deixar a página "andar" para o lado no celular */
-html, body { max-width: 100%; overflow-x: hidden; }
+html, body { max-width: 100%; overflow-x: clip; } /* clip não quebra o topo fixo */
 img, video { max-width: 100%; }
 select { max-width: 100%; text-overflow: ellipsis; }

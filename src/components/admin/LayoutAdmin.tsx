@@ -67,7 +67,7 @@ export default function LayoutAdmin() {
   ]
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] pb-20 md:pb-0 overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] pb-20 md:pb-0 [overflow-x:clip]">
       <header className="bg-ink text-[#E9DCC2] sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <Link to="/admin" className="flex items-center gap-2.5">
