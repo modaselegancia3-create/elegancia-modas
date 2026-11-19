@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import Bloco, { Controles, mover } from '../../components/admin/Bloco'
 import CampoFoto from '../../components/admin/CampoFoto'
-import SeletorPecas, { type PecaResumo } from '../../components/admin/SeletorPecas'
+import SeletorPecas, { promoPadrao, type OpcaoPromo, type PecaResumo } from '../../components/admin/SeletorPecas'
 import { useConfig } from '../../context/ConfigContext'
 import { enviarVideo, numeroBR } from '../../lib/admin'
 import { buscarCategorias } from '../../lib/catalogo'
@@ -49,7 +49,7 @@ export default function Aparencia() {
   const [produtos, setProdutos] = useState<PecaResumo[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [aberto, setAberto] = useState<BlocoId | null>(null)
-  const [descontos, setDescontos] = useState<Record<string, number>>({})
+  const [descontos, setDescontos] = useState<Record<string, OpcaoPromo>>({})
   const outletInicial = useRef<string[]>([])
   const [bannerAberto, setBannerAberto] = useState<number | null>(null)
   const [enviandoVideo, setEnviandoVideo] = useState(0)
@@ -85,15 +85,21 @@ export default function Aparencia() {
       )
     supabase
       .from('produtos')
-      .select('id,preco,preco_promocional')
-      .then(({ data }) => {
-        const d: Record<string, number> = {}
+      .select('id,preco,preco_promocional,promo_inicio,promo_fim,promo_riscado')
+      .then(({ data, error }) => {
+        const d: Record<string, OpcaoPromo> = {}
         ;((data as any[]) ?? []).forEach((p) => {
           const preco = Number(p.preco)
           const promo = p.preco_promocional == null ? null : Number(p.preco_promocional)
-          if (promo && promo < preco) d[p.id] = Math.round((1 - promo / preco) * 100)
+          if (promo && promo < preco)
+            d[p.id] = {
+              pct: Math.round((1 - promo / preco) * 100),
+              inicio: p.promo_inicio ?? '',
+              fim: p.promo_fim ?? '',
+              riscado: p.promo_riscado !== false,
+            }
         })
-        setDescontos(d)
+        if (!error) setDescontos(d)
       })
   }, [])
 
@@ -177,14 +183,17 @@ export default function Aparencia() {
       // Outlet: aplica o % de desconto em cada peça escolhida e tira a promoção das que saíram
       for (const id of c.outlet_ids ?? []) {
         const pr = produtos.find((x) => x.id === id)
-        const pct = descontos[id] ?? 0
+        const o = descontos[id] ?? promoPadrao()
         if (!pr) continue
-        const promo = pct > 0 ? Math.round(pr.preco * (1 - pct / 100) * 100) / 100 : null
-        const { error: ePromo } = await supabase.from('produtos').update({ preco_promocional: promo }).eq('id', id)
+        const promo = o.pct > 0 ? Math.round(pr.preco * (1 - o.pct / 100) * 100) / 100 : null
+        const { error: ePromo } = await supabase
+          .from('produtos')
+          .update({ preco_promocional: promo, promo_inicio: o.inicio || null, promo_fim: o.fim || null, promo_riscado: o.riscado })
+          .eq('id', id)
         if (ePromo) throw ePromo
       }
       for (const id of outletInicial.current.filter((x) => !(c.outlet_ids ?? []).includes(x))) {
-        await supabase.from('produtos').update({ preco_promocional: null }).eq('id', id)
+        await supabase.from('produtos').update({ preco_promocional: null, promo_inicio: null, promo_fim: null }).eq('id', id)
       }
       outletInicial.current = c.outlet_ids ?? []
       await sincronizarLista('avisos', avisos.filter((a) => a.texto.trim()))
@@ -511,7 +520,7 @@ export default function Aparencia() {
           onChange={(v) => set('outlet_ids', v)}
           automatico="o site mostra as peças que já têm preço promocional."
           descontos={descontos}
-          onDesconto={(id, pct) => setDescontos((d) => ({ ...d, [id]: pct }))}
+          onDesconto={(id, o) => setDescontos((d) => ({ ...d, [id]: o }))}
         />
       </Bloco>
 

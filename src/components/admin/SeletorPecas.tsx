@@ -9,10 +9,13 @@ type Props = {
   selecionadas: string[]
   onChange: (ids: string[]) => void
   automatico: string // explicação do que acontece sem escolha
-  /** Outlet: % de desconto por peça */
-  descontos?: Record<string, number>
-  onDesconto?: (id: string, pct: number) => void
+  /** Outlet: % de desconto, prazo e riscado por peça */
+  descontos?: Record<string, OpcaoPromo>
+  onDesconto?: (id: string, o: OpcaoPromo) => void
 }
+
+export type OpcaoPromo = { pct: number; inicio: string; fim: string; riscado: boolean }
+export const promoPadrao = (): OpcaoPromo => ({ pct: 0, inicio: '', fim: '', riscado: true })
 
 const sem = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
@@ -20,7 +23,7 @@ const sem = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCas
 export default function SeletorPecas({ pecas, selecionadas, onChange, automatico, descontos, onDesconto }: Props) {
   const [aberto, setAberto] = useState(false)
   const [busca, setBusca] = useState('')
-  const [todosPct, setTodosPct] = useState('')
+  const [todas, setTodas] = useState<OpcaoPromo>(promoPadrao)
 
   const lista = useMemo(() => {
     const t = sem(busca.trim())
@@ -49,72 +52,46 @@ export default function SeletorPecas({ pecas, selecionadas, onChange, automatico
       {escolhidas.length === 0 && <p className="text-xs text-muted bg-[#F6F4F1] p-3">Nenhuma peça escolhida: {automatico}</p>}
 
       {onDesconto && escolhidas.length > 1 && (
-        <div className="flex items-end gap-2">
-          <label className="flex-1 min-w-0 flex flex-col gap-1 text-xs tracking-[0.1em] uppercase text-muted">
-            Mesmo % para todas
-            <input
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={90}
-              value={todosPct}
-              onChange={(e) => setTodosPct(e.target.value)}
-              placeholder="Ex.: 20"
-              className="border border-[#CFCAC2] bg-white px-3 py-2.5 text-base w-full"
-            />
-          </label>
+        <div className="border border-dashed border-[#CFCAC2] p-3 flex flex-col gap-2">
+          <span className="text-xs tracking-[0.1em] uppercase text-muted">Aplicar em todas</span>
+          <EditorPromo valor={todas} onChange={setTodas} />
           <button
             type="button"
-            onClick={() => {
-              const n = Math.min(90, Math.max(0, Number(todosPct) || 0))
-              escolhidas.forEach((p) => onDesconto(p.id, n))
-            }}
-            className="min-h-[46px] px-4 border border-ink text-xs uppercase tracking-[0.12em]"
+            onClick={() => escolhidas.forEach((p) => onDesconto(p.id, { ...todas }))}
+            className="self-start min-h-[44px] px-4 border border-ink text-xs uppercase tracking-[0.12em]"
           >
-            Aplicar
+            Aplicar em todas
           </button>
         </div>
       )}
 
       {escolhidas.map((p, i) => {
-        const pct = descontos?.[p.id] ?? 0
-        const novo = Math.round(p.preco * (1 - pct / 100) * 100) / 100
+        const o = descontos?.[p.id] ?? promoPadrao()
+        const novo = Math.round(p.preco * (1 - o.pct / 100) * 100) / 100
         return (
-          <div key={p.id} className="border border-line p-2 flex items-center gap-2 min-w-0">
-            <img src={p.foto ?? '/logo.png'} alt="" className="w-12 h-16 object-cover bg-[#F3F1EE] shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm leading-tight line-clamp-2">{p.nome}</p>
-              {onDesconto ? (
-                <p className="text-xs mt-0.5">
-                  {pct > 0 ? (
-                    <>
-                      <strong>{dinheiro(novo)}</strong> <s className="text-muted">{dinheiro(p.preco)}</s>
-                    </>
-                  ) : (
-                    <span className="text-[#A3361F]">Coloque o % de desconto</span>
-                  )}
-                </p>
-              ) : (
-                <p className="text-xs text-muted mt-0.5">{dinheiro(p.preco_promocional && p.preco_promocional < p.preco ? p.preco_promocional : p.preco)}</p>
-              )}
+          <div key={p.id} className="border border-line p-2 flex flex-col gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <img src={p.foto ?? '/logo.png'} alt="" className="w-12 h-16 object-cover bg-[#F3F1EE] shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm leading-tight line-clamp-2">{p.nome}</p>
+                {onDesconto ? (
+                  <p className="text-xs mt-0.5">
+                    {o.pct > 0 ? (
+                      <>
+                        <strong>{dinheiro(novo)}</strong> {o.riscado && <s className="text-muted">{dinheiro(p.preco)}</s>}
+                        <span className="text-muted"> · {o.pct}% OFF</span>
+                      </>
+                    ) : (
+                      <span className="text-[#A3361F]">Coloque o % de desconto</span>
+                    )}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted mt-0.5">{dinheiro(p.preco_promocional && p.preco_promocional < p.preco ? p.preco_promocional : p.preco)}</p>
+                )}
+              </div>
+              <Controles i={i} total={escolhidas.length} mover={(d) => onChange(mover(selecionadas, i, d))} remover={() => alternar(p.id)} />
             </div>
-            {onDesconto && (
-              <label className="flex items-center gap-1 shrink-0">
-                <span className="sr-only">Desconto de {p.nome}</span>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  max={90}
-                  value={pct || ''}
-                  onChange={(e) => onDesconto(p.id, Math.min(90, Math.max(0, Number(e.target.value) || 0)))}
-                  className="w-14 border border-[#CFCAC2] px-2 py-2 text-center text-base"
-                  placeholder="0"
-                />
-                <span className="text-sm">%</span>
-              </label>
-            )}
-            <Controles i={i} total={escolhidas.length} mover={(d) => onChange(mover(selecionadas, i, d))} remover={() => alternar(p.id)} />
+            {onDesconto && <EditorPromo valor={o} onChange={(v) => onDesconto(p.id, v)} />}
           </div>
         )
       })}
@@ -155,6 +132,60 @@ export default function SeletorPecas({ pecas, selecionadas, onChange, automatico
           </ul>
         </div>
       )}
+    </div>
+  )
+}
+
+/** % de desconto + prazo (sem prazo / de–até) + mostrar riscado */
+function EditorPromo({ valor, onChange }: { valor: OpcaoPromo; onChange: (v: OpcaoPromo) => void }) {
+  const comPrazo = !!(valor.inicio || valor.fim)
+  const set = (parte: Partial<OpcaoPromo>) => onChange({ ...valor, ...parte })
+  const hoje = new Date().toISOString().slice(0, 10)
+  return (
+    <div className="flex flex-col gap-2 bg-[#F6F4F1] p-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <label className="flex items-center gap-1.5 text-sm">
+          Desconto
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={90}
+            value={valor.pct || ''}
+            onChange={(e) => set({ pct: Math.min(90, Math.max(0, Number(e.target.value) || 0)) })}
+            className="w-16 border border-[#CFCAC2] bg-white px-2 py-2 text-center text-base"
+            placeholder="0"
+          />
+          %
+        </label>
+        <label className="flex items-center gap-2 text-sm min-h-[40px]">
+          <input type="checkbox" className="w-5 h-5 accent-ink" checked={valor.riscado} onChange={(e) => set({ riscado: e.target.checked })} />
+          Mostrar preço antigo riscado
+        </label>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={comPrazo ? 'prazo' : 'sem'}
+          onChange={(e) => set(e.target.value === 'sem' ? { inicio: '', fim: '' } : { inicio: valor.inicio || hoje, fim: valor.fim || '' })}
+          className="border border-[#CFCAC2] bg-white px-2 py-2 text-sm"
+          aria-label="Prazo da promoção"
+        >
+          <option value="sem">Sem prazo (ilimitado)</option>
+          <option value="prazo">Com prazo</option>
+        </select>
+        {comPrazo && (
+          <>
+            <label className="flex items-center gap-1 text-sm">
+              de
+              <input type="date" value={valor.inicio} onChange={(e) => set({ inicio: e.target.value })} className="border border-[#CFCAC2] bg-white px-2 py-1.5 text-sm" />
+            </label>
+            <label className="flex items-center gap-1 text-sm">
+              até
+              <input type="date" value={valor.fim} min={valor.inicio || undefined} onChange={(e) => set({ fim: e.target.value })} className="border border-[#CFCAC2] bg-white px-2 py-1.5 text-sm" />
+            </label>
+          </>
+        )}
+      </div>
     </div>
   )
 }

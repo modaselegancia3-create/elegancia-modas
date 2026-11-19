@@ -5,7 +5,7 @@ import { useSacola } from '../context/SacolaContext'
 import { fotoCapa } from '../lib/catalogo'
 import { useFavoritos } from '../lib/favoritos'
 import { linkWhats } from '../lib/whatsapp'
-import { dinheiro, ordenarTamanhos, parcelas, precoFinal } from '../lib/format'
+import { dinheiro, mostrarRiscado, ordenarTamanhos, parcelas, precoFinal } from '../lib/format'
 import type { Video } from '../lib/vitrine'
 import type { Produto } from '../types'
 import { IconeFechar } from './Icones'
@@ -303,7 +303,7 @@ function MiniCartaoManual({ v }: { v: VideoComProduto }) {
 
 function MiniCartao({ p }: { p: Produto }) {
   const preco = precoFinal(p)
-  const promo = preco < p.preco
+  const promo = mostrarRiscado(p)
   return (
     <span className="absolute left-2.5 right-2.5 bottom-2.5 bg-white/80 backdrop-blur-md rounded-2xl p-2 flex items-center gap-2.5 text-ink">
       <img src={fotoCapa(p)} alt="" className="w-11 h-11 object-cover rounded-lg shrink-0" />
@@ -341,7 +341,7 @@ function CartaoPeca({
   const { adicionar } = useSacola()
   const { config } = useConfig()
   const preco = precoFinal(p)
-  const promo = preco < p.preco
+  const promo = mostrarRiscado(p)
   const cores = useMemo(() => Array.from(new Set(p.variantes.map((v) => v.cor))), [p])
   const [cor, setCor] = useState(() => p.variantes.find((v) => v.estoque > 0)?.cor ?? cores[0] ?? '')
   const tamanhos = p.variantes.filter((v) => v.cor === cor).sort((a, b) => ordenarTamanhos(a.tamanho, b.tamanho))

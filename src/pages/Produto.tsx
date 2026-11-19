@@ -5,7 +5,7 @@ import { IconeVoltar } from '../components/Icones'
 import { useConfig } from '../context/ConfigContext'
 import { useSacola } from '../context/SacolaContext'
 import { buscarProduto, buscarProdutos, fotoCapa } from '../lib/catalogo'
-import { dinheiro, ordenarTamanhos, parcelas, precoFinal } from '../lib/format'
+import { dinheiro, mostrarRiscado, ordenarTamanhos, parcelas, precoFinal } from '../lib/format'
 import type { Produto as TProduto } from '../types'
 
 export default function Produto() {
@@ -79,7 +79,7 @@ export default function Produto() {
   }
 
   const preco = precoFinal(p)
-  const promo = preco < p.preco
+  const promo = mostrarRiscado(p)
   const variante = tamanhos.find((v) => v.tamanho === tamanho)
   const esgotado = p.variantes.every((v) => v.estoque <= 0)
   const fotos = p.fotos.length ? p.fotos : [{ url: fotoCapa(p), ordem: 0 }]

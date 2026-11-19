@@ -25,6 +25,9 @@ export type Produto = {
   descricao: string | null
   preco: number
   preco_promocional: number | null
+  promo_inicio?: string | null
+  promo_fim?: string | null
+  promo_riscado?: boolean | null
   destaque: boolean
   criado_em: string
   categoria: { nome: string; slug: string } | null

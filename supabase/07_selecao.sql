@@ -19,3 +19,9 @@ alter table public.videos
   add column if not exists nome text,
   add column if not exists preco numeric(10,2),
   add column if not exists preco_antigo numeric(10,2);
+
+-- Promoção com prazo e opção de mostrar o preço antigo riscado
+alter table public.produtos
+  add column if not exists promo_inicio date,
+  add column if not exists promo_fim date,
+  add column if not exists promo_riscado boolean not null default true;

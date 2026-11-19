@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 import type { Categoria, Produto } from '../types'
 
 const SELECT = `
-  id, nome, slug, descricao, preco, preco_promocional, destaque, criado_em,
+  id, nome, slug, descricao, preco, preco_promocional, promo_inicio, promo_fim, promo_riscado, destaque, criado_em,
   categoria:categorias ( nome, slug ),
   fotos:produto_fotos ( url, ordem ),
   variantes ( id, cor, cor_hex, tamanho, estoque )

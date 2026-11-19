@@ -2,13 +2,13 @@ import { Link } from 'react-router-dom'
 import { useConfig } from '../context/ConfigContext'
 import type { Produto } from '../types'
 import { emEstoque, fotoCapa } from '../lib/catalogo'
-import { dinheiro, precoFinal } from '../lib/format'
+import { dinheiro, mostrarRiscado, precoFinal } from '../lib/format'
 
 /** Cartão de peça no estilo vitrine: nome em maiúsculas centralizado, preço e parcelas. */
 export default function CardProduto({ p }: { p: Produto }) {
   const { config } = useConfig()
   const preco = precoFinal(p)
-  const promo = preco < p.preco
+  const promo = mostrarRiscado(p)
   const desconto = promo ? Math.round((1 - preco / p.preco) * 100) : 0
   const esgotado = !emEstoque(p)
   const n = config.parcelas_sem_juros

@@ -6,7 +6,7 @@ import { VideosVitrine, type VideoComProduto } from '../components/Stories'
 import Vitrine from '../components/Vitrine'
 import { useConfig } from '../context/ConfigContext'
 import { buscarCategorias, buscarProdutos, emEstoque } from '../lib/catalogo'
-import { ordenarTamanhos, precoFinal } from '../lib/format'
+import { ordenarTamanhos, promoValendo } from '../lib/format'
 import { buscarVideos, type Video } from '../lib/vitrine'
 import type { Categoria, Produto } from '../types'
 
@@ -51,8 +51,8 @@ export default function Inicio() {
   const outlet = useMemo(
     () =>
       config.outlet_ids?.length
-        ? escolhidas(config.outlet_ids).filter((p) => precoFinal(p) < p.preco)
-        : todos.filter((p) => precoFinal(p) < p.preco && emEstoque(p)),
+        ? escolhidas(config.outlet_ids).filter((p) => promoValendo(p))
+        : todos.filter((p) => promoValendo(p) && emEstoque(p)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [todos, config.outlet_ids],
   )
