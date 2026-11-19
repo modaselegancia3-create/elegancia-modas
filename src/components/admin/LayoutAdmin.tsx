@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
 import { souAdmin } from '../../lib/admin'
+import { useAppPainel } from './AppPainel'
 import { IcLoja, IcLista, IcMais, IcPecas, IcPincel, IcSair } from './IconesAdmin'
 
 type Estado = 'carregando' | 'sem-login' | 'sem-permissao' | 'ok'
@@ -11,6 +12,7 @@ export default function LayoutAdmin() {
   const [estado, setEstado] = useState<Estado>('carregando')
   const [sessao, setSessao] = useState<Session | null>(null)
   const navigate = useNavigate()
+  useAppPainel()
   const { pathname } = useLocation()
 
   useEffect(() => {

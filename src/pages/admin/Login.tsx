@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useAppPainel } from '../../components/admin/AppPainel'
 import { supabase } from '../../lib/supabase'
 
 export default function Login() {
@@ -8,6 +9,7 @@ export default function Login() {
   const [erro, setErro] = useState('')
   const [enviando, setEnviando] = useState(false)
   const navigate = useNavigate()
+  useAppPainel()
   const location = useLocation()
   const voltar = (location.state as { voltar?: string } | null)?.voltar ?? '/admin'
 
