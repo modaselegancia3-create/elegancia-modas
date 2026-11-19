@@ -45,6 +45,9 @@ export type Config = {
   lancamentos_ids: string[]
   mais_vendidos_ids: string[]
   outlet_ids: string[]
+  lancamentos_texto: string | null
+  mais_vendidos_texto: string | null
+  outlet_texto: string | null
 }
 
 export const CONFIG_PADRAO: Config = {
@@ -92,6 +95,9 @@ export const CONFIG_PADRAO: Config = {
   lancamentos_ids: [],
   mais_vendidos_ids: [],
   outlet_ids: [],
+  lancamentos_texto: null,
+  mais_vendidos_texto: null,
+  outlet_texto: null,
 }
 
 export async function buscarConfig(): Promise<Config> {

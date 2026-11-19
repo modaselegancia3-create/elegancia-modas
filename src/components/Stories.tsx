@@ -64,7 +64,7 @@ export function VideosVitrine({ videos, titulo }: { videos: VideoComProduto[]; t
               preload="metadata"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            {v.produto && <MiniCartao p={v.produto} />}
+            {v.produto ? <MiniCartao p={v.produto} /> : (v.nome || v.preco) ? <MiniCartaoManual v={v} /> : null}
           </button>
         ))}
       </div>
@@ -167,7 +167,7 @@ function StoriesTelaCheia({ videos, inicio, onFechar }: { videos: VideoComProdut
         />
 
         {/* zonas de toque: esquerda volta, direita avança, meio pausa */}
-        <div className="absolute inset-0 flex" style={{ bottom: p ? 200 : 0, right: 72 }}>
+        <div className="absolute inset-0 flex" style={{ bottom: p || v.nome || v.preco ? 200 : 0, right: 72 }}>
           <button type="button" aria-label="Vídeo anterior" onClick={anterior} className="w-1/3 h-full" />
           <button type="button" aria-label={pausado ? 'Continuar' : 'Pausar'} onClick={() => setPausado((x) => !x)} className="w-1/3 h-full" />
           <button type="button" aria-label="Próximo vídeo" onClick={proximo} className="w-1/3 h-full" />
@@ -243,6 +243,34 @@ function StoriesTelaCheia({ videos, inicio, onFechar }: { videos: VideoComProdut
           )}
         </div>
 
+        {/* peça digitada à mão no painel */}
+        {!p && (v.nome || v.preco) && (
+          <div className="absolute inset-x-0 bottom-0 p-3 pr-[72px] pb-[max(14px,env(safe-area-inset-bottom))]">
+            <div className="bg-[#5B5752]/55 backdrop-blur-md rounded-2xl p-3 flex flex-col gap-3 text-white">
+              <div>
+                {v.nome && <p className="text-[15px] leading-tight">{v.nome}</p>}
+                {v.preco != null && (
+                  <p className="mt-1 flex items-baseline gap-2">
+                    <span className="text-lg font-bold">{dinheiro(Number(v.preco))}</span>
+                    {v.preco_antigo != null && Number(v.preco_antigo) > Number(v.preco) && <s className="text-xs text-white/70">{dinheiro(Number(v.preco_antigo))}</s>}
+                  </p>
+                )}
+              </div>
+              <a
+                href={linkWhats(`Olá! Vi no vídeo do site e quero: ${v.nome ?? 'esta peça'}${v.preco != null ? ` (${dinheiro(Number(v.preco))})` : ''}`, config.whatsapp)}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full min-h-[48px] rounded-xl bg-white/95 text-ink text-[15px] font-medium px-4 flex items-center justify-between"
+              >
+                Comprar pelo WhatsApp
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.8-5.2A8.4 8.4 0 1 1 21 11.5z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        )}
+
         {/* peça do vídeo */}
         {p && (
           <div className="absolute inset-x-0 bottom-0 p-3 pr-[72px] pb-[max(14px,env(safe-area-inset-bottom))]">
@@ -256,6 +284,20 @@ function StoriesTelaCheia({ videos, inicio, onFechar }: { videos: VideoComProdut
         )}
       </div>
     </div>
+  )
+}
+
+function MiniCartaoManual({ v }: { v: VideoComProduto }) {
+  return (
+    <span className="absolute left-2.5 right-2.5 bottom-2.5 bg-white/80 backdrop-blur-md rounded-2xl p-2.5 flex flex-col text-ink">
+      {v.nome && <span className="text-[12px] leading-tight line-clamp-2">{v.nome}</span>}
+      {v.preco != null && (
+        <span className="text-[13px] font-bold mt-0.5">
+          {dinheiro(Number(v.preco))}{' '}
+          {v.preco_antigo != null && Number(v.preco_antigo) > Number(v.preco) && <s className="text-[10px] font-normal text-[#8F887E] ml-0.5">{dinheiro(Number(v.preco_antigo))}</s>}
+        </span>
+      )}
+    </span>
   )
 }
 

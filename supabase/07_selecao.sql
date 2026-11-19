@@ -7,3 +7,15 @@ alter table public.configuracoes
   add column if not exists lancamentos_ids uuid[] default '{}',
   add column if not exists mais_vendidos_ids uuid[] default '{}',
   add column if not exists outlet_ids uuid[] default '{}';
+
+-- Descrição (texto embaixo do título) de cada vitrine
+alter table public.configuracoes
+  add column if not exists lancamentos_texto text,
+  add column if not exists mais_vendidos_texto text,
+  add column if not exists outlet_texto text;
+
+-- Vídeo com nome e preço digitados à mão (quando não escolher uma peça)
+alter table public.videos
+  add column if not exists nome text,
+  add column if not exists preco numeric(10,2),
+  add column if not exists preco_antigo numeric(10,2);

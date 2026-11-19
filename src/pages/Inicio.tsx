@@ -172,10 +172,10 @@ export default function Inicio() {
         </div>
       )}
 
-      {config.lancamentos_ativo && <Vitrine titulo={config.lancamentos_titulo} produtos={lancamentos} verTudo="/?vitrine=lancamentos" />}
+      {config.lancamentos_ativo && <Vitrine titulo={config.lancamentos_titulo} descricao={config.lancamentos_texto} produtos={lancamentos} verTudo="/?vitrine=lancamentos" />}
       {config.videos_ativo && <VideosVitrine videos={videosComProduto} titulo={config.videos_titulo} />}
-      {config.mais_vendidos_ativo && <Vitrine titulo={config.mais_vendidos_titulo} produtos={maisVendidos} verTudo="/?vitrine=mais-vendidos" />}
-      {config.outlet_ativo && <Vitrine titulo={config.outlet_titulo} produtos={outlet} verTudo="/?vitrine=outlet" />}
+      {config.mais_vendidos_ativo && <Vitrine titulo={config.mais_vendidos_titulo} descricao={config.mais_vendidos_texto} produtos={maisVendidos} verTudo="/?vitrine=mais-vendidos" />}
+      {config.outlet_ativo && <Vitrine titulo={config.outlet_titulo} descricao={config.outlet_texto} produtos={outlet} verTudo="/?vitrine=outlet" />}
 
       {config.look_ativo && destaque && (
         <section className="mt-16 bg-cream">

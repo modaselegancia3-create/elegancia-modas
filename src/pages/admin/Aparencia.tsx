@@ -3,7 +3,7 @@ import Bloco, { Controles, mover } from '../../components/admin/Bloco'
 import CampoFoto from '../../components/admin/CampoFoto'
 import SeletorPecas, { type PecaResumo } from '../../components/admin/SeletorPecas'
 import { useConfig } from '../../context/ConfigContext'
-import { enviarVideo } from '../../lib/admin'
+import { enviarVideo, numeroBR } from '../../lib/admin'
 import { buscarCategorias } from '../../lib/catalogo'
 import { dinheiro } from '../../lib/format'
 import { buscarConfig, posicaoCss, type Config } from '../../lib/config'
@@ -151,6 +151,9 @@ export default function Aparencia() {
           outlet_ativo: c.outlet_ativo,
           outlet_titulo: c.outlet_titulo || null,
           lancamentos_ids: c.lancamentos_ids ?? [],
+          lancamentos_texto: c.lancamentos_texto || null,
+          mais_vendidos_texto: c.mais_vendidos_texto || null,
+          outlet_texto: c.outlet_texto || null,
           mais_vendidos_ids: c.mais_vendidos_ids ?? [],
           outlet_ids: c.outlet_ids ?? [],
           look_produto_id: c.look_produto_id || null,
@@ -351,6 +354,10 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.lancamentos_titulo ?? ''} onChange={(e) => set('lancamentos_titulo', e.target.value)} />
         </label>
+        <label className={rotulo}>
+          Descrição (texto embaixo do título)
+          <textarea className={`${campo} min-h-[70px]`} value={c.lancamentos_texto ?? ''} onChange={(e) => set('lancamentos_texto', e.target.value)} placeholder="Opcional" />
+        </label>
         <SeletorPecas
           pecas={produtos}
           selecionadas={c.lancamentos_ids ?? []}
@@ -411,7 +418,17 @@ export default function Aparencia() {
               </label>
               {(() => {
                 const pr = produtos.find((x) => x.id === v.produto_id)
-                if (!pr) return <p className="text-xs text-[#A3361F]">Sem peça: o vídeo aparece sem preço e sem botão de compra.</p>
+                if (!pr)
+                  return (
+                    <div className="flex flex-col gap-2 bg-[#F6F4F1] p-2">
+                      <span className="text-xs text-muted">Sem peça? Digite o que aparece no vídeo:</span>
+                      <input className={campo} value={v.nome ?? ''} onChange={(e) => setVideo(i, { nome: e.target.value })} placeholder="Nome (ex.: Vestido longo cetim)" aria-label="Nome no vídeo" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <input className={campo} inputMode="decimal" defaultValue={v.preco != null ? String(v.preco).replace('.', ',') : ''} onBlur={(e) => setVideo(i, { preco: numeroBR(e.target.value) })} placeholder="Preço" aria-label="Preço no vídeo" />
+                        <input className={campo} inputMode="decimal" defaultValue={v.preco_antigo != null ? String(v.preco_antigo).replace('.', ',') : ''} onBlur={(e) => setVideo(i, { preco_antigo: numeroBR(e.target.value) })} placeholder="Preço antigo (opcional)" aria-label="Preço antigo no vídeo" />
+                      </div>
+                    </div>
+                  )
                 const final = pr.preco_promocional && pr.preco_promocional < pr.preco ? pr.preco_promocional : pr.preco
                 return (
                   <div className="flex items-center gap-2 bg-[#F6F4F1] p-2">
@@ -459,6 +476,10 @@ export default function Aparencia() {
           Título
           <input className={campo} value={c.mais_vendidos_titulo ?? ''} onChange={(e) => set('mais_vendidos_titulo', e.target.value)} />
         </label>
+        <label className={rotulo}>
+          Descrição (texto embaixo do título)
+          <textarea className={`${campo} min-h-[70px]`} value={c.mais_vendidos_texto ?? ''} onChange={(e) => set('mais_vendidos_texto', e.target.value)} placeholder="Opcional" />
+        </label>
         <SeletorPecas
           pecas={produtos}
           selecionadas={c.mais_vendidos_ids ?? []}
@@ -479,6 +500,10 @@ export default function Aparencia() {
         <label className={rotulo}>
           Título
           <input className={campo} value={c.outlet_titulo ?? ''} onChange={(e) => set('outlet_titulo', e.target.value)} />
+        </label>
+        <label className={rotulo}>
+          Descrição (texto embaixo do título)
+          <textarea className={`${campo} min-h-[70px]`} value={c.outlet_texto ?? ''} onChange={(e) => set('outlet_texto', e.target.value)} placeholder="Opcional" />
         </label>
         <SeletorPecas
           pecas={produtos}

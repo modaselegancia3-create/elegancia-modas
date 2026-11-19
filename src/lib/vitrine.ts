@@ -20,6 +20,9 @@ export type Video = {
   video_url: string
   capa_url: string | null
   produto_id: string | null
+  nome?: string | null
+  preco?: number | null
+  preco_antigo?: number | null
   ordem: number
   ativo: boolean
 }
