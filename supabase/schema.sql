@@ -249,6 +249,17 @@ create policy cfg_ler on public.configuracoes for select using (true);
 create policy cfg_admin on public.configuracoes for update using (public.is_admin()) with check (public.is_admin());
 
 -- ---------------------------------------------------------------------
+-- PERMISSÕES DA API (garante acesso mesmo se o projeto foi criado
+-- sem "Conceder acesso à API para novas tabelas"). O RLS acima
+-- continua decidindo quem vê o quê.
+-- ---------------------------------------------------------------------
+grant usage on schema public to anon, authenticated;
+grant select on public.categorias, public.produtos, public.produto_fotos,
+  public.variantes, public.configuracoes to anon, authenticated;
+grant select, insert, update, delete on all tables in schema public to authenticated;
+grant execute on function public.is_admin() to anon, authenticated;
+
+-- ---------------------------------------------------------------------
 -- STORAGE: pasta pública "produtos" para as fotos
 -- ---------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
