@@ -279,11 +279,11 @@ export default function Aparencia() {
               <div className="border-t border-line p-3 flex flex-col gap-4 min-w-0">
                 <div className="grid grid-cols-1 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-5">
                   <div className="flex flex-col gap-3 min-w-0">
-                    <CampoFoto rotulo="Foto no computador" dica="Deitada (horizontal)." valor={b.foto_url} onChange={(u) => setBanner(i, { foto_url: u })} proporcao="16/9" posicao={posicaoCss(b.posicao)} />
+                    <CampoFoto rotulo="Foto do banner" dica="Aparece no celular e no computador." valor={b.foto_url} onChange={(u) => setBanner(i, { foto_url: u })} proporcao="16/9" posicao={posicaoCss(b.posicao)} />
                     <Enquadramento id={`bd-${i}`} valor={b.posicao} onChange={(v) => setBanner(i, { posicao: v })} />
                   </div>
                   <div className="flex flex-col gap-3 min-w-0">
-                    <CampoFoto rotulo="Foto no celular" dica="Em pé. Opcional." valor={b.foto_mobile_url} onChange={(u) => setBanner(i, { foto_mobile_url: u })} proporcao="9/16" posicao={posicaoCss(b.foto_mobile_url ? b.posicao_mobile : b.posicao)} />
+                    <CampoFoto rotulo="Outra foto só para o celular" dica="Opcional. Em pé." valor={b.foto_mobile_url} onChange={(u) => setBanner(i, { foto_mobile_url: u })} proporcao="9/16" posicao={posicaoCss(b.foto_mobile_url ? b.posicao_mobile : b.posicao)} />
                     <Enquadramento id={`bm-${i}`} valor={b.posicao_mobile} onChange={(v) => setBanner(i, { posicao_mobile: v })} />
                   </div>
                 </div>

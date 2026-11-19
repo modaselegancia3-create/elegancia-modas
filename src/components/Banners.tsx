@@ -62,11 +62,11 @@ export default function Banners() {
               aria-roledescription="slide"
               aria-label={`${i + 1} de ${qtd}`}
             >
-              {b.foto_url && (
+              {(b.foto_url || b.foto_mobile_url) && (
                 <picture>
-                  {b.foto_mobile_url && <source media="(max-width: 767px)" srcSet={b.foto_mobile_url} />}
+                  {b.foto_mobile_url && b.foto_url && <source media="(max-width: 767px)" srcSet={b.foto_mobile_url} />}
                   <img
-                    src={b.foto_url}
+                    src={(b.foto_url || b.foto_mobile_url) as string}
                     alt={b.titulo ?? ''}
                     className="absolute inset-0 w-full h-full object-cover capa-foto"
                     style={estilo}
